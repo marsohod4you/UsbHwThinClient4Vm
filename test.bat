@@ -1,0 +1,1 @@
+iverilog -o qqq -g2005 -csrclist -Isdram/rtl/core -Igeneric_fifos/rtl/verilog -DHDMI=1
