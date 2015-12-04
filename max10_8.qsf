@@ -183,6 +183,10 @@ set_instance_assignment -name IO_STANDARD "2.5 V SCHMITT TRIGGER" -to key0
 set_instance_assignment -name IO_STANDARD "2.5 V SCHMITT TRIGGER" -to key1
 set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
 set_global_assignment -name VERILOG_MACRO "HDMI=1"
+set_location_assignment PIN_54 -to SDRAM_BA[0]
+set_location_assignment PIN_55 -to SDRAM_BA[1]
+set_location_assignment PIN_65 -to SDRAM_DQM[0]
+set_location_assignment PIN_41 -to SDRAM_DQM[1]
 set_global_assignment -name VERILOG_FILE sdram/rtl/core/sdrc_xfr_ctl.v
 set_global_assignment -name VERILOG_FILE sdram/rtl/core/sdrc_req_gen.v
 set_global_assignment -name VERILOG_FILE sdram/rtl/core/sdrc_define.v
@@ -195,16 +199,6 @@ set_global_assignment -name VERILOG_FILE videomem_rd_req.v
 set_global_assignment -name VERILOG_FILE videomem_init.v
 set_global_assignment -name VERILOG_FILE hdmi.v
 set_global_assignment -name VERILOG_FILE clocks.v
-set_global_assignment -name BDF_FILE max10.bdf
 set_global_assignment -name QIP_FILE mypll.qip
-set_global_assignment -name CDF_FILE output_files/Chain2.cdf
-set_global_assignment -name CDF_FILE output_files/Chain3.cdf
-set_global_assignment -name CDF_FILE output_files/Chain1.cdf
-set_global_assignment -name SIGNALTAP_FILE stp1.stp
 set_global_assignment -name VERILOG_FILE top.v
-set_location_assignment PIN_54 -to SDRAM_BA[0]
-set_location_assignment PIN_55 -to SDRAM_BA[1]
-set_global_assignment -name SIGNALTAP_FILE stp2.stp
-set_location_assignment PIN_65 -to SDRAM_DQM[0]
-set_location_assignment PIN_41 -to SDRAM_DQM[1]
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
