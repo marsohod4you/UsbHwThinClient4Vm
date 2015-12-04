@@ -32,7 +32,7 @@ mt48lc4m16a2 u_mt48lc4m16
     .Cas_n (w_sdr_cas_n)
 	);
 
-wire [3:0]test_leds;
+wire [7:0]test_leds;
 wire w_hsync;
 wire w_vsync;
 
