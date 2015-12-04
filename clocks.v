@@ -34,19 +34,22 @@ always
 //use Quartus PLLs for real clock and reset synthesis
 wire w_locked;
 wire w_video_clk;
+wire w_video_clk5;
 wire w_mem_clk;
-altpll0 u_altpll0(
+mypll u_mypll0(
 	.inclk0(clk_100Mhz),
-	.c0(w_mem_clk),
-	.c1(w_video_clk),
+	.c0(w_video_clk),
+	.c1(w_video_clk5),
+	.c2(w_mem_clk),
 	.locked(w_locked)
 	);
 	
 always @*
 begin
 	reset = ~w_locked;
-	mem_clk = w_mem_clk;
-	video_clk = w_video_clk;
+	mem_clk    = w_mem_clk;
+	video_clk  = w_video_clk;
+	video_clk5 = w_video_clk5;
 end
 
 `endif
