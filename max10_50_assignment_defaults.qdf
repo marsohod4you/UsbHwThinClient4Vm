@@ -1,24 +1,25 @@
 # -------------------------------------------------------------------------- #
 #
-# Copyright (C) 1991-2013 Altera Corporation
+# Copyright (C) 1991-2014 Altera Corporation. All rights reserved.
 # Your use of Altera Corporation's design tools, logic functions 
 # and other software and tools, and its AMPP partner logic 
 # functions, and any output files from any of the foregoing 
 # (including device programming or simulation files), and any 
 # associated documentation or information are expressly subject 
 # to the terms and conditions of the Altera Program License 
-# Subscription Agreement, Altera MegaCore Function License 
-# Agreement, or other applicable license agreement, including, 
-# without limitation, that your use is for the sole purpose of 
-# programming logic devices manufactured by Altera and sold by 
-# Altera or its authorized distributors.  Please refer to the 
-# applicable agreement for further details.
+# Subscription Agreement, the Altera Quartus II License Agreement,
+# the Altera MegaCore Function License Agreement, or other 
+# applicable license agreement, including, without limitation, 
+# that your use is for the sole purpose of programming logic 
+# devices manufactured by Altera and sold by Altera or its 
+# authorized distributors.  Please refer to the applicable 
+# agreement for further details.
 #
 # -------------------------------------------------------------------------- #
 #
 # Quartus II 64-Bit
-# Version 13.0.0 Build 156 04/24/2013 SJ Web Edition
-# Date created = 07:39:46  November 22, 2015
+# Version 14.1.0 Build 186 12/03/2014 SJ Web Edition
+# Date created = 13:21:40  June 05, 2015
 #
 # -------------------------------------------------------------------------- #
 #
@@ -30,12 +31,13 @@
 #
 # -------------------------------------------------------------------------- #
 
+set_global_assignment -name IP_COMPONENT_REPORT_HIERARCHY Off
+set_global_assignment -name IP_COMPONENT_INTERNAL Off
 set_global_assignment -name PROJECT_SHOW_ENTITY_NAME On
 set_global_assignment -name PROJECT_USE_SIMPLIFIED_NAMES Off
 set_global_assignment -name ENABLE_REDUCED_MEMORY_MODE Off
 set_global_assignment -name VER_COMPATIBLE_DB_DIR export_db
 set_global_assignment -name AUTO_EXPORT_VER_COMPATIBLE_DB Off
-set_global_assignment -name SMART_RECOMPILE Off
 set_global_assignment -name FLOW_DISABLE_ASSEMBLER Off
 set_global_assignment -name FLOW_ENABLE_POWER_ANALYZER Off
 set_global_assignment -name FLOW_ENABLE_HC_COMPARE Off
@@ -54,94 +56,56 @@ set_global_assignment -name CUT_OFF_PATHS_BETWEEN_CLOCK_DOMAINS On
 set_global_assignment -name CUT_OFF_READ_DURING_WRITE_PATHS On
 set_global_assignment -name CUT_OFF_IO_PIN_FEEDBACK On
 set_global_assignment -name DO_COMBINED_ANALYSIS Off
+set_global_assignment -name TDC_AGGRESSIVE_HOLD_CLOSURE_EFFORT Off
+set_global_assignment -name EMIF_SOC_PHYCLK_ADVANCE_MODELING Off
+set_global_assignment -name USE_DLL_FREQUENCY_FOR_DQS_DELAY_CHAIN Off
 set_global_assignment -name ANALYZE_LATCHES_AS_SYNCHRONOUS_ELEMENTS On
 set_global_assignment -name TIMEQUEST_REPORT_SCRIPT_INCLUDE_DEFAULT_ANALYSIS On
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS Off -family MAX7000B
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Arria V"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "HardCopy II"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Cyclone IV E"
+set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "MAX 10"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Stratix IV"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Cyclone III"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS Off -family MAX7000AE
+set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Cyclone IV E"
+set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Arria 10"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS Off -family "MAX V"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS Off -family Cyclone
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Stratix II GX"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Stratix V"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Arria V GZ"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS Off -family "MAX II"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Arria II GX"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Arria II GZ"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS Off -family "Stratix GX"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "HardCopy III"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS Off -family MAX7000S
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Cyclone II"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Cyclone IV GX"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "HardCopy IV"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Cyclone III LS"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Stratix III"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Arria GX"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS Off -family MAX3000A
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Stratix II"
 set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS On -family "Cyclone V"
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS Off -family Stratix
 set_global_assignment -name TIMEQUEST_DO_REPORT_TIMING Off
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family MAX7000B
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Arria V"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "HardCopy II"
+set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "MAX 10"
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Stratix IV"
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family "Cyclone IV E"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family "Cyclone III"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family MAX7000AE
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Stratix II GX"
+set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Arria 10"
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family "MAX V"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family Cyclone
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Stratix V"
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Arria V GZ"
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family "MAX II"
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Arria II GX"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Stratix GX"
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Arria II GZ"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "HardCopy III"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family MAX7000S
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family "Cyclone II"
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family "Cyclone IV GX"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "HardCopy IV"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family "Cyclone III LS"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Stratix III"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Arria GX"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS On -family MAX3000A
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Stratix II"
-set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family Stratix
 set_global_assignment -name TIMEQUEST_REPORT_WORST_CASE_TIMING_PATHS Off -family "Cyclone V"
 set_global_assignment -name TIMEQUEST_REPORT_NUM_WORST_CASE_TIMING_PATHS 100
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family MAX7000B
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Arria V"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family "HardCopy II"
+set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "MAX 10"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Cyclone IV E"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Stratix IV"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Cyclone III"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family MAX7000AE
+set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Arria 10"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family "MAX V"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family Cyclone
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family "Stratix II GX"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Stratix V"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Arria V GZ"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family "MAX II"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Arria II GX"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family "Stratix GX"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Arria II GZ"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family MAX7000S
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "HardCopy III"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family "Cyclone II"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Cyclone IV GX"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "HardCopy IV"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Cyclone III LS"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Stratix III"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family "Arria GX"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family MAX3000A
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family "Stratix II"
 set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL On -family "Cyclone V"
-set_global_assignment -name TIMEQUEST_DO_CCPP_REMOVAL Off -family Stratix
+set_global_assignment -name OPTIMIZATION_MODE Balanced
+set_global_assignment -name ALLOW_REGISTER_MERGING On
+set_global_assignment -name ALLOW_REGISTER_DUPLICATION On
+set_global_assignment -name TIMEQUEST2 OFF
 set_global_assignment -name MUX_RESTRUCTURE Auto
 set_global_assignment -name MLAB_ADD_TIMING_CONSTRAINTS_FOR_MIXED_PORT_FEED_THROUGH_MODE_SETTING_DONT_CARE Off
 set_global_assignment -name ENABLE_IP_DEBUG Off
@@ -235,22 +199,12 @@ set_global_assignment -name MAX_RAM_BLOCKS_MRAM "-1 (Unlimited)"
 set_global_assignment -name IGNORE_TRANSLATE_OFF_AND_SYNTHESIS_OFF Off
 set_global_assignment -name STRATIXGX_BYPASS_REMAPPING_OF_FORCE_SIGNAL_DETECT_SIGNAL_THRESHOLD_SELECT Off
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Arria II GZ"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "HardCopy III"
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Arria V"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS Off -family "Cyclone II"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS Off -family "HardCopy II"
+set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "MAX 10"
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Cyclone IV GX"
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Stratix IV"
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Cyclone IV E"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "HardCopy IV"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Cyclone III"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Cyclone III LS"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Stratix III"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Arria VI"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Stratix VI"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS Off -family "Arria GX"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS Off -family "Stratix II GX"
-set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS Off -family "Stratix II"
+set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Arria 10"
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Stratix V"
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Arria V GZ"
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS On -family "Cyclone V"
@@ -260,35 +214,24 @@ set_global_assignment -name REPORT_SOURCE_ASSIGNMENTS On
 set_global_assignment -name REPORT_CONNECTIVITY_CHECKS On
 set_global_assignment -name IGNORE_MAX_FANOUT_ASSIGNMENTS Off
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Arria V"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "HardCopy II"
+set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "MAX 10"
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Cyclone IV E"
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Stratix IV"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Cyclone III"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Stratix VI"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family Cyclone
+set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Arria 10"
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "MAX V"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Stratix II GX"
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Stratix V"
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "MAX II"
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Arria V GZ"
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Arria II GX"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Stratix GX"
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Arria II GZ"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "HardCopy III"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Cyclone II"
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Cyclone IV GX"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "HardCopy IV"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Cyclone III LS"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Stratix III"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Arria VI"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Arria GX"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family "Stratix II"
-set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 2 -family Stratix
 set_global_assignment -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 3 -family "Cyclone V"
 set_global_assignment -name OPTIMIZE_POWER_DURING_SYNTHESIS "Normal compilation"
 set_global_assignment -name HDL_MESSAGE_LEVEL Level2
 set_global_assignment -name USE_HIGH_SPEED_ADDER Auto
 set_global_assignment -name NUMBER_OF_REMOVED_REGISTERS_REPORTED 5000
+set_global_assignment -name NUMBER_OF_SYNTHESIS_MIGRATION_ROWS 5000
+set_global_assignment -name SYNTHESIS_S10_MIGRATION_CHECKS Off
 set_global_assignment -name NUMBER_OF_SWEPT_NODES_REPORTED 5000
 set_global_assignment -name NUMBER_OF_INVERTED_REGISTERS_REPORTED 100
 set_global_assignment -name SYNTH_CLOCK_MUX_PROTECTION On
@@ -301,31 +244,22 @@ set_global_assignment -name PRE_MAPPING_RESYNTHESIS Off
 set_global_assignment -name SYNTH_MESSAGE_LEVEL Medium
 set_global_assignment -name DISABLE_REGISTER_MERGING_ACROSS_HIERARCHIES Auto
 set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Arria II GZ"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "HardCopy III"
 set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Arria V"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Cyclone II"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "HardCopy II"
+set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "MAX 10"
 set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Cyclone IV GX"
 set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Stratix IV"
 set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Cyclone IV E"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "HardCopy IV"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Cyclone III LS"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Cyclone III"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Arria VI"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Stratix III"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Stratix VI"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family Cyclone
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Stratix II"
+set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Arria 10"
 set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Stratix V"
 set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Arria V GZ"
 set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Cyclone V"
-set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family Stratix
 set_global_assignment -name SYNTH_RESOURCE_AWARE_INFERENCE_FOR_BLOCK_RAM On -family "Arria II GX"
 set_global_assignment -name MAX_LABS "-1 (Unlimited)"
 set_global_assignment -name RBCGEN_CRITICAL_WARNING_TO_ERROR On
-set_global_assignment -name SYNTHESIS_SEED 1
 set_global_assignment -name MAX_NUMBER_OF_REGISTERS_FROM_UNINFERRED_RAMS "-1 (Unlimited)"
-set_global_assignment -name AUTO_PARALLEL_SYNTHESIS Off
+set_global_assignment -name AUTO_PARALLEL_SYNTHESIS On
+set_global_assignment -name PRPOF_ID Off
+set_global_assignment -name DISABLE_DSP_NEGATE_INFERENCING Off
 set_global_assignment -name FLEX10K_ENABLE_LOCK_OUTPUT Off
 set_global_assignment -name AUTO_MERGE_PLLS On
 set_global_assignment -name IGNORE_MODE_FOR_MERGE Off
@@ -346,9 +280,13 @@ set_global_assignment -name RESERVE_NCEO_AFTER_CONFIGURATION "Use as regular IO"
 set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "Use as programming pin"
 set_global_assignment -name STRATIXIII_UPDATE_MODE Standard
 set_global_assignment -name STRATIX_UPDATE_MODE Standard
+set_global_assignment -name INTERNAL_FLASH_UPDATE_MODE "Single Image"
+set_global_assignment -name FALLBACK_TO_EXTERNAL_FLASH Off
+set_global_assignment -name EXTERNAL_FLASH_FALLBACK_ADDRESS 00000000
 set_global_assignment -name CVP_MODE Off
 set_global_assignment -name STRATIXV_CONFIGURATION_SCHEME "Passive Serial"
 set_global_assignment -name STRATIXIII_CONFIGURATION_SCHEME "Passive Serial"
+set_global_assignment -name MAX10FPGA_CONFIGURATION_SCHEME "Internal Configuration"
 set_global_assignment -name CYCLONEIII_CONFIGURATION_SCHEME "Active Serial"
 set_global_assignment -name STRATIXII_CONFIGURATION_SCHEME "Passive Serial"
 set_global_assignment -name CYCLONEII_CONFIGURATION_SCHEME "Active Serial"
@@ -376,84 +314,56 @@ set_global_assignment -name RESERVE_DATA31_THROUGH_DATA16_AFTER_CONFIGURATION "U
 set_global_assignment -name RESERVE_DATA15_THROUGH_DATA8_AFTER_CONFIGURATION "Use as regular IO"
 set_global_assignment -name RESERVE_DATA7_THROUGH_DATA1_AFTER_CONFIGURATION "Use as regular IO"
 set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "As input tri-stated"
-set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "Use as regular IO" -family "Cyclone II"
-set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "Use as regular IO" -family Cyclone
-set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "Use as regular IO" -family "Stratix II GX"
-set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "Use as regular IO" -family "HardCopy II"
-set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "Use as regular IO" -family "Arria GX"
-set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "Use as regular IO" -family "Stratix II"
 set_global_assignment -name RESERVE_DATA1_AFTER_CONFIGURATION "As input tri-stated"
 set_global_assignment -name RESERVE_DATA7_THROUGH_DATA2_AFTER_CONFIGURATION "Use as regular IO"
 set_global_assignment -name RESERVE_DATA7_THROUGH_DATA5_AFTER_CONFIGURATION "Use as regular IO"
 set_global_assignment -name RESERVE_FLASH_NCE_AFTER_CONFIGURATION "As input tri-stated"
 set_global_assignment -name RESERVE_OTHER_AP_PINS_AFTER_CONFIGURATION "Use as regular IO"
 set_global_assignment -name RESERVE_DCLK_AFTER_CONFIGURATION "Use as programming pin"
+set_global_assignment -name ENABLE_CONFIGURATION_PINS On
+set_global_assignment -name ENABLE_JTAG_PIN_SHARING Off
+set_global_assignment -name ENABLE_NCE_PIN Off
+set_global_assignment -name ENABLE_BOOT_SEL_PIN On
 set_global_assignment -name CRC_ERROR_CHECKING Off
 set_global_assignment -name INTERNAL_SCRUBBING Off
 set_global_assignment -name PR_ERROR_OPEN_DRAIN On
 set_global_assignment -name PR_READY_OPEN_DRAIN On
 set_global_assignment -name ENABLE_CVP_CONFDONE Off
 set_global_assignment -name CVP_CONFDONE_OPEN_DRAIN On
+set_global_assignment -name ENABLE_NCONFIG_FROM_CORE On
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Arria II GZ"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "IO Paths and Minimum TPD Paths" -family "Stratix GX"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "HardCopy III"
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Arria V"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "IO Paths and Minimum TPD Paths" -family "Cyclone II"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "IO Paths and Minimum TPD Paths" -family "HardCopy II"
+set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "MAX 10"
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Cyclone IV GX"
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Stratix IV"
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Cyclone IV E"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "HardCopy IV"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Cyclone III LS"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Cyclone III"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Stratix III"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Arria VI"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Stratix VI"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Arria GX"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "IO Paths and Minimum TPD Paths" -family Cyclone
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "IO Paths and Minimum TPD Paths" -family "Stratix II GX"
+set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Arria 10"
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "IO Paths and Minimum TPD Paths" -family "MAX V"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "IO Paths and Minimum TPD Paths" -family "Stratix II"
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Stratix V"
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "IO Paths and Minimum TPD Paths" -family "MAX II"
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Arria V GZ"
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Cyclone V"
-set_global_assignment -name OPTIMIZE_HOLD_TIMING "IO Paths and Minimum TPD Paths" -family Stratix
 set_global_assignment -name OPTIMIZE_HOLD_TIMING "All Paths" -family "Arria II GX"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family MAX7000B
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Arria V"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "HardCopy II"
+set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "MAX 10"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Cyclone IV E"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Stratix IV"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Cyclone III"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family "Stratix VI"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family MAX7000AE
+set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Arria 10"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family "MAX V"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family Cyclone
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Stratix II GX"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Stratix V"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Arria V GZ"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family "MAX II"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Arria II GX"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family "Stratix GX"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Arria II GZ"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family MAX7000S
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "HardCopy III"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Cyclone II"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Cyclone IV GX"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "HardCopy IV"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Cyclone III LS"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family "Arria VI"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Stratix III"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Arria GX"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family MAX3000A
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Stratix II"
 set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING On -family "Cyclone V"
-set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING Off -family Stratix
 set_global_assignment -name BLOCK_RAM_TO_MLAB_CELL_CONVERSION On
 set_global_assignment -name BLOCK_RAM_AND_MLAB_EQUIVALENT_POWER_UP_CONDITIONS Auto
 set_global_assignment -name BLOCK_RAM_AND_MLAB_EQUIVALENT_PAUSED_READ_CAPABILITIES Care
-set_global_assignment -name PROGRAMMABLE_POWER_TECHNOLOGY_SETTING Automatic
+set_global_assignment -name PROGRAMMABLE_POWER_TECHNOLOGY_SETTING Automatic -family "Stratix IV"
+set_global_assignment -name PROGRAMMABLE_POWER_TECHNOLOGY_SETTING "Force All Used Tiles to High Speed" -family "Arria 10"
+set_global_assignment -name PROGRAMMABLE_POWER_TECHNOLOGY_SETTING Automatic -family "Stratix V"
+set_global_assignment -name PROGRAMMABLE_POWER_TECHNOLOGY_SETTING Automatic -family "Arria V GZ"
 set_global_assignment -name PROGRAMMABLE_POWER_MAXIMUM_HIGH_SPEED_FRACTION_OF_USED_LAB_TILES 1.0
 set_global_assignment -name GUARANTEE_MIN_DELAY_CORNER_IO_ZERO_HOLD_TIME On
 set_global_assignment -name OPTIMIZE_POWER_DURING_FITTING "Normal compilation"
@@ -473,11 +383,8 @@ set_global_assignment -name WEAK_PULL_UP_RESISTOR Off
 set_global_assignment -name ENABLE_BUS_HOLD_CIRCUITRY Off
 set_global_assignment -name AUTO_GLOBAL_MEMORY_CONTROLS Off
 set_global_assignment -name MIGRATION_CONSTRAIN_CORE_RESOURCES On
-set_global_assignment -name AUTO_PACKED_REGISTERS_STRATIXII AUTO
-set_global_assignment -name AUTO_PACKED_REGISTERS_MAXII AUTO
-set_global_assignment -name AUTO_PACKED_REGISTERS_CYCLONE Auto
-set_global_assignment -name AUTO_PACKED_REGISTERS Off
-set_global_assignment -name AUTO_PACKED_REGISTERS_STRATIX AUTO
+set_global_assignment -name QII_AUTO_PACKED_REGISTERS Auto
+set_global_assignment -name AUTO_PACKED_REGISTERS_MAX Auto
 set_global_assignment -name NORMAL_LCELL_INSERT On
 set_global_assignment -name CARRY_OUT_PINS_LCELL_INSERT On
 set_global_assignment -name AUTO_DELAY_CHAINS On
@@ -498,8 +405,8 @@ set_global_assignment -name OVERRIDE_DEFAULT_ELECTROMIGRATION_PARAMETERS Off
 set_global_assignment -name FITTER_EFFORT "Auto Fit"
 set_global_assignment -name FITTER_AUTO_EFFORT_DESIRED_SLACK_MARGIN 0ns
 set_global_assignment -name PHYSICAL_SYNTHESIS_EFFORT Normal
-set_global_assignment -name ROUTER_LCELL_INSERTION_AND_LOGIC_DUPLICATION AUTO
-set_global_assignment -name ROUTER_REGISTER_DUPLICATION AUTO
+set_global_assignment -name ROUTER_LCELL_INSERTION_AND_LOGIC_DUPLICATION Auto
+set_global_assignment -name ROUTER_REGISTER_DUPLICATION Auto
 set_global_assignment -name STRATIXGX_ALLOW_CLOCK_FANOUT_WITH_ANALOG_RESET Off
 set_global_assignment -name AUTO_GLOBAL_CLOCK On
 set_global_assignment -name AUTO_GLOBAL_OE On
@@ -528,28 +435,23 @@ set_global_assignment -name SYNCHRONIZER_IDENTIFICATION Off
 set_global_assignment -name ENABLE_BENEFICIAL_SKEW_OPTIMIZATION On
 set_global_assignment -name OPTIMIZE_FOR_METASTABILITY On
 set_global_assignment -name CRC_ERROR_OPEN_DRAIN On -family "Arria V"
+set_global_assignment -name CRC_ERROR_OPEN_DRAIN Off -family "MAX 10"
 set_global_assignment -name CRC_ERROR_OPEN_DRAIN Off -family "Cyclone IV E"
-set_global_assignment -name CRC_ERROR_OPEN_DRAIN Off -family "Cyclone III"
-set_global_assignment -name CRC_ERROR_OPEN_DRAIN On -family "Stratix VI"
+set_global_assignment -name CRC_ERROR_OPEN_DRAIN On -family "Arria 10"
 set_global_assignment -name CRC_ERROR_OPEN_DRAIN On -family "Stratix V"
 set_global_assignment -name CRC_ERROR_OPEN_DRAIN On -family "Arria V GZ"
-set_global_assignment -name CRC_ERROR_OPEN_DRAIN Off -family "HardCopy III"
-set_global_assignment -name CRC_ERROR_OPEN_DRAIN Off -family "Cyclone III LS"
-set_global_assignment -name CRC_ERROR_OPEN_DRAIN Off -family "Stratix III"
-set_global_assignment -name CRC_ERROR_OPEN_DRAIN On -family "Arria VI"
 set_global_assignment -name CRC_ERROR_OPEN_DRAIN On -family "Cyclone V"
 set_global_assignment -name MAX_GLOBAL_CLOCKS_ALLOWED "-1 (Unlimited)"
 set_global_assignment -name MAX_REGIONAL_CLOCKS_ALLOWED "-1 (Unlimited)"
 set_global_assignment -name MAX_PERIPHERY_CLOCKS_ALLOWED "-1 (Unlimited)"
 set_global_assignment -name MAX_CLOCKS_ALLOWED "-1 (Unlimited)"
-set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_100MHz -family "Arria VI"
-set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_100MHz -family "Stratix VI"
+set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_100MHz -family "Arria 10"
 set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_100MHz -family "Arria V"
 set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_100MHz -family "Stratix V"
 set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_40MHz -family "Cyclone IV GX"
 set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_100MHz -family "Arria V GZ"
-set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_40MHz -family "Arria II GX"
 set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_100MHz -family "Cyclone V"
+set_global_assignment -name ACTIVE_SERIAL_CLOCK FREQ_40MHz -family "Arria II GX"
 set_global_assignment -name M144K_BLOCK_READ_CLOCK_DUTY_CYCLE_DEPENDENCY Off
 set_global_assignment -name STRATIXIII_MRAM_COMPATIBILITY On
 set_global_assignment -name FORCE_FITTER_TO_AVOID_PERIPHERY_PLACEMENT_WARNINGS Off
@@ -564,7 +466,13 @@ set_global_assignment -name TRI_STATE_SPI_PINS Off
 set_global_assignment -name UNUSED_TSD_PINS_GND Off
 set_global_assignment -name IMPLEMENT_MLAB_IN_16_BIT_DEEP_MODE Off
 set_global_assignment -name FORM_DDR_CLUSTERING_CLIQUE Off
-set_global_assignment -name ALM_REGISTER_PACKING_EFFORT MEDIUM
+set_global_assignment -name ALM_REGISTER_PACKING_EFFORT Medium
+set_global_assignment -name ADVANCED_PHYSICAL_OPTIMIZATION On -family "Arria V"
+set_global_assignment -name ADVANCED_PHYSICAL_OPTIMIZATION Off -family "Stratix IV"
+set_global_assignment -name ADVANCED_PHYSICAL_OPTIMIZATION On -family "Arria 10"
+set_global_assignment -name ADVANCED_PHYSICAL_OPTIMIZATION On -family "Stratix V"
+set_global_assignment -name ADVANCED_PHYSICAL_OPTIMIZATION On -family "Arria V GZ"
+set_global_assignment -name ADVANCED_PHYSICAL_OPTIMIZATION On -family "Cyclone V"
 set_global_assignment -name EDA_SIMULATION_TOOL "<None>"
 set_global_assignment -name EDA_TIMING_ANALYSIS_TOOL "<None>"
 set_global_assignment -name EDA_BOARD_DESIGN_TIMING_TOOL "<None>"
@@ -591,30 +499,14 @@ set_global_assignment -name MAX7000_JTAG_USER_CODE FFFFFFFF
 set_global_assignment -name MAX7000_USE_CHECKSUM_AS_USERCODE Off
 set_global_assignment -name USE_CHECKSUM_AS_USERCODE On
 set_global_assignment -name SECURITY_BIT Off
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family MAX7000B
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family "HardCopy II"
-set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "Stratix IV"
+set_global_assignment -name USE_CONFIGURATION_DEVICE On -family "MAX 10"
 set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "Cyclone IV E"
-set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "Cyclone III"
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family MAX7000AE
+set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "Stratix IV"
 set_global_assignment -name USE_CONFIGURATION_DEVICE On -family "MAX V"
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family Cyclone
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family "Stratix II GX"
 set_global_assignment -name USE_CONFIGURATION_DEVICE On -family "MAX II"
 set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "Arria II GX"
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family "Stratix GX"
 set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "Arria II GZ"
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family MAX7000S
-set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "HardCopy III"
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family "Cyclone II"
 set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "Cyclone IV GX"
-set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "HardCopy IV"
-set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "Cyclone III LS"
-set_global_assignment -name USE_CONFIGURATION_DEVICE Off -family "Stratix III"
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family "Arria GX"
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family MAX3000A
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family "Stratix II"
-set_global_assignment -name USE_CONFIGURATION_DEVICE On -family Stratix
 set_global_assignment -name CYCLONEIII_CONFIGURATION_DEVICE Auto
 set_global_assignment -name STRATIXII_CONFIGURATION_DEVICE Auto
 set_global_assignment -name APEX20K_CONFIGURATION_DEVICE Auto
@@ -641,10 +533,20 @@ set_global_assignment -name AUTO_RESTART_CONFIGURATION On
 set_global_assignment -name HARDCOPYII_POWER_ON_EXTRA_DELAY Off
 set_global_assignment -name STRATIXII_MRAM_COMPATIBILITY Off
 set_global_assignment -name CYCLONEII_M4K_COMPATIBILITY On
-set_global_assignment -name ENABLE_OCT_DONE Off
+set_global_assignment -name ENABLE_OCT_DONE Off -family "Arria V"
+set_global_assignment -name ENABLE_OCT_DONE On -family "MAX 10"
+set_global_assignment -name ENABLE_OCT_DONE Off -family "Cyclone IV E"
+set_global_assignment -name ENABLE_OCT_DONE Off -family "Arria 10"
+set_global_assignment -name ENABLE_OCT_DONE Off -family "Stratix V"
+set_global_assignment -name ENABLE_OCT_DONE Off -family "Arria V GZ"
+set_global_assignment -name ENABLE_OCT_DONE Off -family "Arria II GX"
+set_global_assignment -name ENABLE_OCT_DONE Off -family "Cyclone IV GX"
+set_global_assignment -name ENABLE_OCT_DONE Off -family "Cyclone V"
 set_global_assignment -name USE_CHECKERED_PATTERN_AS_UNINITIALIZED_RAM_CONTENT OFF
 set_global_assignment -name ARRIAIIGX_RX_CDR_LOCKUP_FIX_OVERRIDE Off
 set_global_assignment -name ENABLE_AUTONOMOUS_PCIE_HIP Off
+set_global_assignment -name ENABLE_IO_WEAK_PULL_UP_DURING_CONFIG Off
+set_global_assignment -name ENABLE_ADV_SEU_DETECTION Off
 set_global_assignment -name START_TIME 0ns
 set_global_assignment -name SIMULATION_MODE TIMING
 set_global_assignment -name AUTO_USE_SIMULATION_PDB_NETLIST Off
@@ -691,6 +593,7 @@ set_global_assignment -name GENERATE_CONFIG_JBC_FILE Off
 set_global_assignment -name GENERATE_CONFIG_JBC_FILE_COMPRESSED On
 set_global_assignment -name GENERATE_CONFIG_HEXOUT_FILE Off
 set_global_assignment -name ISP_CLAMP_STATE_DEFAULT "Tri-state"
+set_global_assignment -name HPS_EARLY_IO_RELEASE Off
 set_global_assignment -name SIGNALPROBE_ALLOW_OVERUSE Off
 set_global_assignment -name SIGNALPROBE_DURING_NORMAL_COMPILATION Off
 set_global_assignment -name POWER_DEFAULT_TOGGLE_RATE 12.5%
@@ -709,8 +612,10 @@ set_global_assignment -name POWER_USE_CUSTOM_COOLING_SOLUTION Off
 set_global_assignment -name POWER_BOARD_TEMPERATURE 25
 set_global_assignment -name POWER_HPS_ENABLE Off
 set_global_assignment -name POWER_HPS_PROC_FREQ 0.0
+set_global_assignment -name ENABLE_SMART_VOLTAGE_ID Off
 set_global_assignment -name IGNORE_PARTITIONS Off
 set_global_assignment -name AUTO_EXPORT_INCREMENTAL_COMPILATION Off
+set_global_assignment -name RAPID_RECOMPILE_ASSIGNMENT_CHECKING On
 set_global_assignment -name OUTPUT_IO_TIMING_ENDPOINT "Near End"
 set_global_assignment -name RTLV_REMOVE_FANOUT_FREE_REGISTERS On
 set_global_assignment -name RTLV_SIMPLIFIED_LOGIC On
@@ -802,3 +707,4 @@ set_global_assignment -name REMOVE_LOGIC_ON_UNCONNECTED_OUTPUTS On -section_id ?
 set_global_assignment -name MERGE_EQUIVALENT_INPUTS On -section_id ? -entity ?
 set_global_assignment -name MERGE_EQUIVALENT_BIDIRS On -section_id ? -entity ?
 set_global_assignment -name ABSORB_PATHS_FROM_OUTPUTS_TO_INPUTS On -section_id ? -entity ?
+set_global_assignment -name PARTITION_ENABLE_STRICT_PRESERVATION Off -section_id ? -entity ?
