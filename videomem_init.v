@@ -11,7 +11,7 @@ module videomem_init(
 	output reg complete
 	);
 
-parameter NUM_HORZ_WR_REQ = 32;
+parameter NUM_HORZ_WR_REQ = 8;
 parameter NUM_WR_LINES = 720;
 
 reg [3:0]mem_ready_delay = 0;
