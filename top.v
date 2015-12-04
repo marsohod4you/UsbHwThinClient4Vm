@@ -2,11 +2,11 @@
 module top 
 		(
 		input wire CLK100MHZ,
-		output wire [3:0]LED,
+		output wire [7:0]LED,
 
 `ifdef HDMI
 		//HDMI output
-		output wire [7:0]tmds,
+		output wire [7:0]TMDS,
 `else
 		//VGA output
 		output reg VGA_HSYNC,
@@ -249,7 +249,7 @@ begin
 	d_active  <= w_active;
 end
 
-assign LED[3:1] = 3'b000;
+assign LED[7:1] = 0;
 
 `ifdef HDMI
 wire w_tmds_bh;
@@ -266,7 +266,7 @@ hdmi u_hdmi(
 	.active( d_active ),
 	.red(  { out_word[15:11], 3'b000 } ),
 	.green({ out_word[10: 5], 2'b00  } ),
-	.blue( { out_word[4 : 0], 3'b000 } ),
+	.blue( { out_word[ 4: 0], 3'b000 } ),
 	.TMDS_bh( w_tmds_bh ),
 	.TMDS_bl( w_tmds_bl ),
 	.TMDS_gh( w_tmds_gh ),
@@ -276,15 +276,23 @@ hdmi u_hdmi(
 );
 
 `ifdef __ICARUS__
-	ddio u_ddio1( .d0( w_video_clk), .d1( w_video_clk), .clk(w_video_clk5), .out( tmds[1] ) );
-	ddio u_ddio0( .d0(~w_video_clk), .d1(~w_video_clk), .clk(w_video_clk5), .out( tmds[0] ) );
-	ddio u_ddio3( .d0( w_tmds_bh),   .d1( w_tmds_bl),   .clk(w_video_clk5), .out( tmds[3] ) );
-	ddio u_ddio2( .d0(~w_tmds_bh),   .d1(~w_tmds_bl),   .clk(w_video_clk5), .out( tmds[2] ) );
-	ddio u_ddio5( .d0( w_tmds_gh),   .d1( w_tmds_gl),   .clk(w_video_clk5), .out( tmds[5] ) );
-	ddio u_ddio4( .d0(~w_tmds_gh),   .d1(~w_tmds_gl),   .clk(w_video_clk5), .out( tmds[4] ) );
-	ddio u_ddio7( .d0( w_tmds_rh),   .d1( w_tmds_rl),   .clk(w_video_clk5), .out( tmds[7] ) );
-	ddio u_ddio6( .d0(~w_tmds_rh),   .d1(~w_tmds_rl),   .clk(w_video_clk5), .out( tmds[6] ) );
+	ddio u_ddio1( .d1( w_video_clk), .d0( w_video_clk), .clk(w_video_clk5), .out( TMDS[1] ) );
+	ddio u_ddio0( .d1(~w_video_clk), .d0(~w_video_clk), .clk(w_video_clk5), .out( TMDS[0] ) );
+	ddio u_ddio3( .d1( w_tmds_bh),   .d0( w_tmds_bl),   .clk(w_video_clk5), .out( TMDS[3] ) );
+	ddio u_ddio2( .d1(~w_tmds_bh),   .d0(~w_tmds_bl),   .clk(w_video_clk5), .out( TMDS[2] ) );
+	ddio u_ddio5( .d1( w_tmds_gh),   .d0( w_tmds_gl),   .clk(w_video_clk5), .out( TMDS[5] ) );
+	ddio u_ddio4( .d1(~w_tmds_gh),   .d0(~w_tmds_gl),   .clk(w_video_clk5), .out( TMDS[4] ) );
+	ddio u_ddio7( .d1( w_tmds_rh),   .d0( w_tmds_rl),   .clk(w_video_clk5), .out( TMDS[7] ) );
+	ddio u_ddio6( .d1(~w_tmds_rh),   .d0(~w_tmds_rl),   .clk(w_video_clk5), .out( TMDS[6] ) );
 `else
+	altddio_out1 u_ddio1( .datain_h( w_video_clk), .datain_l( w_video_clk), .outclock(w_video_clk5), .dataout( TMDS[1] ) );
+	altddio_out1 u_ddio0( .datain_h(~w_video_clk), .datain_l(~w_video_clk), .outclock(w_video_clk5), .dataout( TMDS[0] ) );
+	altddio_out1 u_ddio3( .datain_h( w_tmds_bh),   .datain_l( w_tmds_bl),   .outclock(w_video_clk5), .dataout( TMDS[3] ) );
+	altddio_out1 u_ddio2( .datain_h(~w_tmds_bh),   .datain_l(~w_tmds_bl),   .outclock(w_video_clk5), .dataout( TMDS[2] ) );
+	altddio_out1 u_ddio5( .datain_h( w_tmds_gh),   .datain_l( w_tmds_gl),   .outclock(w_video_clk5), .dataout( TMDS[5] ) );
+	altddio_out1 u_ddio4( .datain_h(~w_tmds_gh),   .datain_l(~w_tmds_gl),   .outclock(w_video_clk5), .dataout( TMDS[4] ) );
+	altddio_out1 u_ddio7( .datain_h( w_tmds_rh),   .datain_l( w_tmds_rl),   .outclock(w_video_clk5), .dataout( TMDS[7] ) );
+	altddio_out1 u_ddio6( .datain_h(~w_tmds_rh),   .datain_l(~w_tmds_rl),   .outclock(w_video_clk5), .dataout( TMDS[6] ) );
 `endif
 
 `else
