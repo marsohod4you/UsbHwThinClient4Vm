@@ -20,21 +20,22 @@ wire [15:0]w_sdr_dq;
 //instance of sdram model
 mt48lc4m16a2 u_mt48lc4m16
     (
-    .Addr(w_sdr_addr),
-    .Dq  (w_sdr_dq),
-    .Ba  (w_sdr_ba),
-    .Dqm (w_sdr_dqm),
     .Clk  (w_sdr_clk),
-    .Cke  (1'b1),
-    .We_n  (w_sdr_we_n),
+    .Addr(w_sdr_addr),
+    .Ba  (w_sdr_ba),
+    .Dq  (w_sdr_dq),
+    .Dqm (w_sdr_dqm),
     .Ras_n (w_sdr_ras_n),
-    .Cs_n  (1'b0),
-    .Cas_n (w_sdr_cas_n)
+    .Cas_n (w_sdr_cas_n),
+    .We_n  (w_sdr_we_n),
+    .Cke  (1'b1),
+    .Cs_n  (1'b0)
 	);
 
 wire [7:0]test_leds;
 wire w_hsync;
 wire w_vsync;
+wire [7:0]w_tmds;
 
 //instance of top module for test
 top u_top
@@ -43,6 +44,7 @@ top u_top
 	.LED(test_leds),
 	
 `ifdef HDMI
+	.TMDS(w_tmds),
 `else
 	.VGA_BLUE(),
 	.VGA_GREEN(),
@@ -53,15 +55,15 @@ top u_top
 
 	/* Interface to SDRAM chip  */
 	.SDRAM_CLK(w_sdr_clk),
-	.SDRAM_CKE(),
-	.SDRAM_CS(),
+	.SDRAM_A(w_sdr_addr),
+	.SDRAM_BA(w_sdr_ba),
+	.SDRAM_DQ(w_sdr_dq),
+	.SDRAM_DQM(w_sdr_dqm),
 	.SDRAM_RAS(w_sdr_ras_n),
 	.SDRAM_CAS(w_sdr_cas_n),
 	.SDRAM_WE(w_sdr_we_n),
-	.SDRAM_DQM(w_sdr_dqm),
-	.SDRAM_BA(w_sdr_ba),
-	.SDRAM_A(w_sdr_addr),
-	.SDRAM_DQ(w_sdr_dq)
+	.SDRAM_CKE(),
+	.SDRAM_CS()
 	);
 
 initial
@@ -74,8 +76,11 @@ initial
 	$display("start debug..");
 	//#150000;
 	//$finish;
-	
+	$dumpon;
+	@(posedge u_top.w_sdr_init_done);
+	#1000;
 	$dumpoff;
+	
 	@(posedge u_top.w_complete);
 	$display("w_complete");
 	#1;
