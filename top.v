@@ -25,20 +25,29 @@ module top
 		output wire SDRAM_RAS,		// SDRAM ras
 		output wire SDRAM_CAS,		// SDRAM cas
 		output wire SDRAM_WE,		// SDRAM write enable
-		output wire [1:0]SDRAM_DQM,// SDRAM Data Mask
+		output wire [1:0]SDRAM_DQM, // SDRAM Data Mask
 		output wire [1:0]SDRAM_BA,	// SDRAM Bank Enable
 		output wire [11:0]SDRAM_A,	// SDRAM Address
-		inout  wire [15:0]SDRAM_DQ // SDRA Data Input/output		            
-	    );
+		inout  wire [15:0]SDRAM_DQ, // SDRAM Data Input/output		            
+
+		input wire ft_clk,
+		input wire ft_rxf,
+		input wire ft_txe,
+		inout wire [7:0]ft_d,
+		output wire ft_rd,
+		output wire ft_wr,
+		output wire ft_oe,
+		
+		input wire KEY0,
+		input wire KEY1
+	   );
 
 //--------------------------------------------
 // appliciation to SDRAM controller Interface 
 //--------------------------------------------
-wire app_req;					// SDRAM request
+wire app_rd_req;					// SDRAM request
 wire [24:0]app_req_addr;		// SDRAM Request Address
 reg [8:0]app_req_len = 4;
-reg	app_req_wr_n = 1'b1;		// 0 - Write, 1 -> Read
-always @* app_req_wr_n = app_req;
 reg [3:0]app_wr_en_n = 4'b0000;	// Active low sdr byte-wise write data valid
 wire [31:0]app_wr_data;		// sdr write data
 wire app_req_ack;				// SDRAM request Accepted
@@ -50,7 +59,6 @@ wire app_last_wr;				// Indicate last Write of Burst Transfer
 wire [31:0]app_rd_data;			// sdr read data
 wire w_wr_req;
 wire [24:0]w_wr_addr;
-wire w_complete;
 
 wire [15:0]sdr_dout;
 wire [1:0]sdr_den_n;
@@ -85,25 +93,25 @@ sdrc_core #( .SDR_DW(16), .SDR_BW(2) )
 		.pad_clk            (w_mem_clk		),
 
 		/* Request from app */
-		.app_req            (w_complete ? app_req : w_wr_req ),// Transfer Request
-		.app_req_addr       (w_complete ? app_req_addr : w_wr_addr ),	// SDRAM Address
-		.app_req_len        (9'd004			),// Burst Length (in 16 bit words)
+		.app_req            (app_rd_req | w_wr_req ),// Transfer Request
+		.app_req_addr       (app_rd_req ? app_req_addr : w_wr_addr ),	// SDRAM Address
+		.app_req_len        (9'd004				),// Burst Length (in 16 bit words)
 		.app_req_wrap       (1'b1				),// Wrap mode request 
-		.app_req_wr_n       (w_complete ? 1'b1 : 1'b0 ),	// 0 => Write request, 1 => read req
+		.app_req_wr_n       (app_rd_req 		),// 0 => Write request, 1 => read req
 		.app_req_ack        (app_req_ack		),// Request has been accepted
  		
 		.app_wr_data        (app_wr_data		),
 		.app_wr_en_n        (4'b0000			),
 		.app_rd_data        (app_rd_data		),
-		.app_rd_valid       (app_rd_valid	),
+		.app_rd_valid       (app_rd_valid		),
 		.app_last_rd        (app_last_rd		),
 		.app_last_wr        (app_last_wr		),
 		.app_wr_next_req    (app_wr_next_req),
-		.app_req_dma_last   (app_req			),
+		.app_req_dma_last   (app_rd_req			),
  
 		/* Interface to SDRAMs */
 `ifdef __ICARUS__ 
-		.sdr_cs_n           (SDRAM_CS			),
+		.sdr_cs_n           (SDRAM_CS		),
 		.sdr_cke            (SDRAM_CKE		),
 `else
 		.sdr_cs_n           (),
@@ -111,18 +119,18 @@ sdrc_core #( .SDR_DW(16), .SDR_BW(2) )
 `endif
 		.sdr_ras_n          (SDRAM_RAS		),
 		.sdr_cas_n          (SDRAM_CAS		),
-		.sdr_we_n           (SDRAM_WE			),
+		.sdr_we_n           (SDRAM_WE		),
 		.sdr_dqm            (SDRAM_DQM		),
-		.sdr_ba             (SDRAM_BA			),
-		.sdr_addr           (SDRAM_A			), 
-		.pad_sdr_din        (pad_sdr_din		),
-		.sdr_dout           (sdr_dout			),
+		.sdr_ba             (SDRAM_BA		),
+		.sdr_addr           (SDRAM_A		),
+		.pad_sdr_din        (pad_sdr_din	),
+		.sdr_dout           (sdr_dout		),
 		.sdr_den_n          (sdr_den_n		),
  
 		.sdr_init_done      (w_sdr_init_done),
 
 		/* Parameters */
-		.sdr_width			  ( 2'b01 ),
+		.sdr_width			( 2'b01 ),
 		.cfg_colbits        (2'b00              ), //2'b00 means 8 Bit Column Address
 		.cfg_req_depth      (2'h3               ), //how many req. buffer should hold
 		.cfg_sdr_en         (1'b1               ),
@@ -161,16 +169,17 @@ wire [1:0]w_wr_level;
 //instance of video memory reader
 videomem_rd_req u_videomem_rd_req(
 	.mem_clock(w_mem_clk),
-	.mem_ready(w_sdr_init_done & w_complete ),
+	.mem_ready(w_sdr_init_done ),
 	.rdata_valid(),
 	.fifo_level(w_wr_level),
 	.hsync(w_hsync),
 	.vsync(w_vsync),
-	.read_req_ack(app_req_ack & w_complete),
-	.read_request(app_req),
+	.read_req_ack(app_req_ack & app_rd_req),
+	.read_request(app_rd_req),
 	.read_addr(app_req_addr)
 	);
 
+/*
 videomem_init u_videomem_init(
 	.mem_clock( w_mem_clk ),
 	.mem_ready( w_sdr_init_done ),
@@ -182,7 +191,25 @@ videomem_init u_videomem_init(
 	.wr_data( app_wr_data ),
 	.complete( w_complete )
 	);
-	
+*/
+ftdi u_ftdi(
+	.rst( (~w_sdr_init_done) | (~(KEY0&KEY1))),
+	.mem_clk(w_mem_clk),
+	.mem_idle(~app_rd_req),
+	.mem_ack(app_req_ack & (~app_rd_req) ),
+	.mem_data_next(app_wr_next_req),
+	.mem_wr_addr(w_wr_addr),
+	.mem_wr_req(w_wr_req),
+	.mem_wr_data(app_wr_data),
+	.ft_clk( ft_clk ),
+	.ft_rxf( ft_rxf ),
+	.ft_txe( ft_tfx ),
+	.ft_data(ft_d ),
+	.ft_oe(  ft_oe ),
+	.ft_rd(  ft_rd ),
+	.ft_wr(  ft_wr )
+);
+
 wire [31:0]w_fifo_out;
 wire w_fifo_empty;
 wire w_fifo_read; assign w_fifo_read = w_active & ~out_word_n & ~w_fifo_empty;
@@ -234,7 +261,7 @@ always @(posedge w_video_clk)
 reg [15:0]out_word;
 always @(posedge w_video_clk)
 	if(w_active)
-		out_word <= out_word_n ?  w_fifo_out[31:16] : w_fifo_out[15:0];
+		out_word <= out_word_n ? w_fifo_out[15:0] : w_fifo_out[31:16];
 	else
 		out_word <= 16'h0;
 
@@ -249,7 +276,8 @@ begin
 	d_active  <= w_active;
 end
 
-assign LED[7:1] = 0;
+assign LED[7:2] = 0;
+assign LED[1] = KEY0;
 
 `ifdef HDMI
 wire w_tmds_bh;
