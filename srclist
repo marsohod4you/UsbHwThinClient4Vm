@@ -3,6 +3,7 @@
  hvsync.v
  clocks.v
  hdmi.v
+ ftdi.v
  generic_dpram.v
  videomem_rd_req.v
  videomem_init.v
