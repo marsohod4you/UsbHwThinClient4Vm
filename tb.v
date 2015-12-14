@@ -37,6 +37,24 @@ wire w_hsync;
 wire w_vsync;
 wire [7:0]w_tmds;
 
+wire [7:0]w_ft_d;
+wire w_ft_clk;
+wire w_ft_rxf;
+wire w_ft_oe;
+wire w_ft_rd;
+wire w_ft_wr;
+reg start_emu = 1'b0;
+
+ftdi_emu u_ftdi_emu(
+	.start_emu(start_emu),
+	.ft_clk(w_ft_clk),
+	.ft_rxf(w_ft_rxf),
+	.ft_d(w_ft_d),
+	.ft_oe(w_ft_oe),
+	.ft_rd(w_ft_rd),
+	.ft_wr(w_ft_wr)
+);
+
 //instance of top module for test
 top u_top
 	(
@@ -63,7 +81,17 @@ top u_top
 	.SDRAM_CAS(w_sdr_cas_n),
 	.SDRAM_WE(w_sdr_we_n),
 	.SDRAM_CKE(),
-	.SDRAM_CS()
+	.SDRAM_CS(),
+	
+	.ft_clk( w_ft_clk ),
+	.ft_rxf( w_ft_rxf ),
+	.ft_txe( w_ft_tfx ),
+	.ft_d  ( w_ft_d   ),
+	.ft_oe ( w_ft_oe  ),
+	.ft_rd ( w_ft_rd  ),
+	.ft_wr ( w_ft_wr  ),
+	.KEY0(1'b1),
+	.KEY1(1'b1)
 	);
 
 initial
@@ -78,11 +106,16 @@ initial
 	//$finish;
 	$dumpon;
 	@(posedge u_top.w_sdr_init_done);
-	#1000;
+	@(negedge u_top.app_rd_req);
+	#20;
+	start_emu = 1'b1;
+	#150000;
 	$dumpoff;
 	
-	@(posedge u_top.w_complete);
-	$display("w_complete");
+	$finish;
+	
+	@(posedge u_top.w_sdr_init_done);
+	$display("w_sdr_init_done");
 	#1;
 	@(posedge u_top.w_vsync);
 	$display("w_vsync 0");
