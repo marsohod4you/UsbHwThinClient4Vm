@@ -6,7 +6,7 @@
 module clocks (
 	input wire clk_100Mhz,
 	output reg reset,
-	output reg mem_clk,
+	output reg mem_clk = 0,
 	output reg video_clk = 0,
 	output reg video_clk5 = 0
 	);
@@ -20,8 +20,8 @@ always @(posedge clk_100Mhz)
 always @*
 	reset = ~rst_delay[3];
 
-always @*
-	mem_clk = clk_100Mhz;
+always
+	# 3.38 mem_clk = ~mem_clk;
 	
 always
 	#6.7 video_clk = ~video_clk;
