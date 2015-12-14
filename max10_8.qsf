@@ -114,21 +114,7 @@ set_location_assignment PIN_122 -to TMDS[2]
 set_location_assignment PIN_121 -to TMDS[1]
 set_location_assignment PIN_120 -to TMDS[0]
 
-set_location_assignment PIN_17 -to FTD[0]
-set_location_assignment PIN_135 -to FTD[1]
-set_location_assignment PIN_132 -to FTD[2]
-set_location_assignment PIN_134 -to FTD[3]
-set_location_assignment PIN_24 -to FTD[4]
-set_location_assignment PIN_22 -to FTD[5]
-set_location_assignment PIN_21 -to FTD[6]
-set_location_assignment PIN_15 -to FTD[7]
-set_location_assignment PIN_14 -to FTC[0]
-set_location_assignment PIN_13 -to FTC[1]
-set_location_assignment PIN_12 -to FTC[2]
-set_location_assignment PIN_11 -to FTC[3]
 set_location_assignment PIN_10 -to FTC[4]
-set_location_assignment PIN_8 -to FTC[5]
-set_location_assignment PIN_7 -to FTC[6]
 set_location_assignment PIN_6 -to FTC[7]
 
 set_location_assignment PIN_89 -to IO[0]
@@ -168,12 +154,12 @@ set_global_assignment -name OUTPUT_IO_TIMING_FAR_END_VMEAS "HALF SIGNAL SWING" -
 set_global_assignment -name ENABLE_OCT_DONE ON
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_WEAK_PULLUP "AS INPUT TRI-STATED"
 set_global_assignment -name ENABLE_SIGNALTAP OFF
-set_global_assignment -name USE_SIGNALTAP_FILE stp2.stp
+set_global_assignment -name USE_SIGNALTAP_FILE output_files/stp1.stp
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name FLOW_ENABLE_POWER_ANALYZER ON
 set_global_assignment -name POWER_DEFAULT_INPUT_IO_TOGGLE_RATE "12.5 %"
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_NETLIST_TYPE POST_FIT -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to key0
@@ -187,6 +173,21 @@ set_location_assignment PIN_54 -to SDRAM_BA[0]
 set_location_assignment PIN_55 -to SDRAM_BA[1]
 set_location_assignment PIN_65 -to SDRAM_DQM[0]
 set_location_assignment PIN_41 -to SDRAM_DQM[1]
+set_location_assignment PIN_14 -to ft_rxf
+set_location_assignment PIN_13 -to ft_txe
+set_location_assignment PIN_8 -to ft_clk
+set_location_assignment PIN_17 -to ft_d[0]
+set_location_assignment PIN_135 -to ft_d[1]
+set_location_assignment PIN_132 -to ft_d[2]
+set_location_assignment PIN_134 -to ft_d[3]
+set_location_assignment PIN_24 -to ft_d[4]
+set_location_assignment PIN_22 -to ft_d[5]
+set_location_assignment PIN_21 -to ft_d[6]
+set_location_assignment PIN_15 -to ft_d[7]
+set_location_assignment PIN_12 -to ft_rd
+set_location_assignment PIN_11 -to ft_wr
+set_location_assignment PIN_7 -to ft_oe
+set_global_assignment -name VERILOG_FILE generic_fifos/rtl/verilog/generic_fifo_dc_gray.v
 set_global_assignment -name VERILOG_FILE sdram/rtl/core/sdrc_xfr_ctl.v
 set_global_assignment -name VERILOG_FILE sdram/rtl/core/sdrc_req_gen.v
 set_global_assignment -name VERILOG_FILE sdram/rtl/core/sdrc_define.v
@@ -201,4 +202,6 @@ set_global_assignment -name VERILOG_FILE hdmi.v
 set_global_assignment -name VERILOG_FILE clocks.v
 set_global_assignment -name QIP_FILE mypll.qip
 set_global_assignment -name VERILOG_FILE top.v
+set_global_assignment -name QIP_FILE wrfifo.qip
+set_global_assignment -name SIGNALTAP_FILE output_files/stp1.stp
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
