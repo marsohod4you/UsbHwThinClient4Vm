@@ -120,6 +120,7 @@ module mt48lc4m16a2 (Dq, Addr, Ba, Clk, Cke, Cs_n, Ras_n, Cas_n, We_n, Dqm);
     wire      Write_burst_mode = Mode_reg[9];
 
     wire      Debug            = 0;                          // Debug messages : 1 = On
+    wire      Debug2           = 1;                          // Debug important messages : 1 = On
     wire      Dq_chk           = Sys_clk & Data_in_enable;      // Check setup/hold time for DQ
     
     assign    Dq               = Dq_reg;                        // DQ buffer
@@ -283,7 +284,7 @@ module mt48lc4m16a2 (Dq, Addr, Ba, Clk, Cke, Cs_n, Ras_n, Cas_n, We_n, Dqm);
             Mode_reg = Addr;
 
             // Decode CAS Latency, Burst Length, Burst Type, and Write Burst Mode
-            if (Debug) begin
+            if (Debug2) begin
                 $display ("%m : at time %t LMR  : Load Mode Register", $time);
                 // CAS Latency
                 case (Addr[6 : 4])
@@ -937,11 +938,11 @@ module mt48lc4m16a2 (Dq, Addr, Ba, Clk, Cke, Cs_n, Ras_n, Cas_n, We_n, Dqm);
                 // Record tWR for manual precharge
                 WR_chkm [Bank] = $time;
 
-                if (Debug) begin
-                    $display("%m : at time %t WRITE: Bank = %d Row = %d, Col = %d, Data = %d", $time, Bank, Row, Col, Dq_dqm);
+                if (Debug2) begin
+                    $display("%m : at time %t WRITE: Bank = %d Row = %d, Col = %d, Data = %x", $time, Bank, Row, Col, Dq_dqm);
                 end
             end else begin
-                if (Debug) begin
+                if (Debug2) begin
                     $display("%m : at time %t WRITE: Bank = %d Row = %d, Col = %d, Data = Hi-Z due to DQM", $time, Bank, Row, Col);
                 end
             end
