@@ -32,9 +32,9 @@ always @(posedge mem_clock)
 	vsync_shift <= { vsync_shift[2:0], vsync };
 wire _vsync; assign _vsync = (vsync_shift[3:2]==2'b10);
 
-reg [9:0]num_hread=0;
+reg [8:0]num_hread=0;
 reg [12:0]num_lines=0;
-assign read_addr =  { num_lines, num_hread, 2'b00 };
+assign read_addr =  { num_lines, num_hread, 3'b000 };
 
 //check FIFO level and decide to feed
 reg fifo_need_feed; 
