@@ -47,16 +47,14 @@ module top
 //--------------------------------------------
 wire app_rd_req;					// SDRAM request
 wire [24:0]app_req_addr;		// SDRAM Request Address
-reg [8:0]app_req_len = 4;
-reg [3:0]app_wr_en_n = 4'b0000;	// Active low sdr byte-wise write data valid
-wire [31:0]app_wr_data;		// sdr write data
+wire [15:0]app_wr_data;		// sdr write data
 wire app_req_ack;				// SDRAM request Accepted
 wire app_busy_n;				// 0 -> sdr busy
 wire app_wr_next_req;			// Ready to accept the next write
 wire app_rd_valid;				// sdr read valid
 wire app_last_rd;				// Indicate last Read of Burst Transfer
 wire app_last_wr;				// Indicate last Write of Burst Transfer
-wire [31:0]app_rd_data;			// sdr read data
+wire [15:0]app_rd_data;			// sdr read data
 wire w_wr_req;
 wire [24:0]w_wr_addr;
 
@@ -86,7 +84,7 @@ clocks u_clocks(
 assign SDRAM_CLK = w_mem_clk;
 
 //instance of SDR controller core
-sdrc_core #( .SDR_DW(16), .SDR_BW(2) )
+sdrc_core #( .APP_DW(16), .APP_BW(2), .SDR_DW(16), .SDR_BW(2) )
 	u_sdrc_core (
 		.clk                (w_mem_clk		),
 		.reset_n            (~w_reset			),
@@ -94,14 +92,14 @@ sdrc_core #( .SDR_DW(16), .SDR_BW(2) )
 
 		/* Request from app */
 		.app_req            (app_rd_req | w_wr_req ),// Transfer Request
-		.app_req_addr       (app_rd_req ? app_req_addr : w_wr_addr ),	// SDRAM Address
-		.app_req_len        (9'd004				),// Burst Length (in 16 bit words)
+		.app_req_addr       (app_rd_req ? app_req_addr : w_wr_addr ), // SDRAM Address
+		.app_req_len        (app_rd_req ? 9'd008 : 9'd001		   ), // Burst Length
 		.app_req_wrap       (1'b1				),// Wrap mode request 
 		.app_req_wr_n       (app_rd_req 		),// 0 => Write request, 1 => read req
 		.app_req_ack        (app_req_ack		),// Request has been accepted
  		
 		.app_wr_data        (app_wr_data		),
-		.app_wr_en_n        (4'b0000			),
+		.app_wr_en_n        (2'b00				),
 		.app_rd_data        (app_rd_data		),
 		.app_rd_valid       (app_rd_valid		),
 		.app_last_rd        (app_last_rd		),
@@ -130,11 +128,11 @@ sdrc_core #( .SDR_DW(16), .SDR_BW(2) )
 		.sdr_init_done      (w_sdr_init_done),
 
 		/* Parameters */
-		.sdr_width			( 2'b01 ),
+		.sdr_width			(2'b01 ),
 		.cfg_colbits        (2'b00              ), //2'b00 means 8 Bit Column Address
 		.cfg_req_depth      (2'h3               ), //how many req. buffer should hold
 		.cfg_sdr_en         (1'b1               ),
-		.cfg_sdr_mode_reg   (12'h023            ),
+		.cfg_sdr_mode_reg   (12'h223            ), //single location write, 8 words read
 		.cfg_sdr_tras_d     (4'h4               ), //SDRAM active to precharge, specified in clocks
 		.cfg_sdr_trp_d      (4'h2               ), //SDRAM precharge command period (tRP), specified in clocks.
 		.cfg_sdr_trcd_d     (4'h2               ), //SDRAM active to read or write delay (tRCD), specified in clocks.
@@ -192,6 +190,8 @@ videomem_init u_videomem_init(
 	.complete( w_complete )
 	);
 */
+wire w_ft_dbg;
+
 ftdi u_ftdi(
 	.rst( (~w_sdr_init_done) | (~(KEY0&KEY1))),
 	.mem_clk(w_mem_clk),
@@ -207,15 +207,16 @@ ftdi u_ftdi(
 	.ft_data(ft_d ),
 	.ft_oe(  ft_oe ),
 	.ft_rd(  ft_rd ),
-	.ft_wr(  ft_wr )
+	.ft_wr(  ft_wr ),
+	.dbg( w_ft_dbg)
 );
 
-wire [31:0]w_fifo_out;
+wire [15:0]w_fifo_out;
 wire w_fifo_empty;
-wire w_fifo_read; assign w_fifo_read = w_active & ~out_word_n & ~w_fifo_empty;
+wire w_fifo_read; assign w_fifo_read = w_active & ~w_fifo_empty;
 
 `ifdef __ICARUS__ 
-generic_fifo_dc_gray #( .dw(32), .aw(8) ) u_generic_fifo_dc_gray (
+generic_fifo_dc_gray #( .dw(16), .aw(8) ) u_generic_fifo_dc_gray (
 	.rd_clk(w_video_clk),
 	.wr_clk(w_mem_clk),
 	.rst(~w_reset),
@@ -223,7 +224,7 @@ generic_fifo_dc_gray #( .dw(32), .aw(8) ) u_generic_fifo_dc_gray (
 	.din(app_rd_data),
 	.we(app_rd_valid),
 	.dout(w_fifo_out),
-	.re(w_fifo_read),
+	.rd(w_fifo_read),
 	.full(),
 	.empty(w_fifo_empty),
 	.wr_level(w_wr_level),
@@ -249,19 +250,10 @@ assign w_wr_level =  (usedw>=196) ? 2'b11 :
 							(usedw>=64)  ? 2'b01 : 2'b00;
 `endif
 
-reg out_word_n=0;
-always @(posedge w_video_clk)
-	if(w_hsync)
-		out_word_n <= 1'b0;
-	else
-	if(w_active)
-		out_word_n <= ~out_word_n;
-	
-
 reg [15:0]out_word;
 always @(posedge w_video_clk)
 	if(w_active)
-		out_word <= out_word_n ? w_fifo_out[15:0] : w_fifo_out[31:16];
+		out_word <= w_fifo_out[15:0];
 	else
 		out_word <= 16'h0;
 
@@ -276,8 +268,9 @@ begin
 	d_active  <= w_active;
 end
 
-assign LED[7:2] = 0;
+assign LED[7:3] = 0;
 assign LED[1] = KEY0;
+assign LED[2] = w_ft_dbg;
 
 `ifdef HDMI
 wire w_tmds_bh;
