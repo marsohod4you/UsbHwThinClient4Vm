@@ -106,24 +106,25 @@ initial
 	//$finish;
 	$dumpon;
 	@(posedge u_top.w_sdr_init_done);
+	$display("w_sdr_init_done");
 	@(negedge u_top.app_rd_req);
-	#20;
+	//#20;
 	start_emu = 1'b1;
-	#150000;
+	#100000;
+	print_mem(16);
 	$dumpoff;
 	
-	$finish;
+	//$finish;
 	
-	@(posedge u_top.w_sdr_init_done);
-	$display("w_sdr_init_done");
-	#1;
 	@(posedge u_top.w_vsync);
 	$display("w_vsync 0");
 	#1;
 	@(posedge u_top.w_vsync);
 	$display("w_vsync 1");
 	$dumpon;
-    #1000000;
+    @(posedge u_top.w_vsync);
+	$display("w_vsync 2");
+	#1000;
 	$display("End of simulation!");
 	$finish;
     end
@@ -164,6 +165,20 @@ begin
 		end
 		//$finish;
 	end
+end
+endtask
+
+task print_mem;
+input [31:0]addr;
+begin
+	$display("addr %x %x",addr+0,u_mt48lc4m16.Bank0[addr+0]);
+	$display("addr %x %x",addr+1,u_mt48lc4m16.Bank0[addr+1]);
+	$display("addr %x %x",addr+2,u_mt48lc4m16.Bank0[addr+2]);
+	$display("addr %x %x",addr+3,u_mt48lc4m16.Bank0[addr+3]);
+	$display("addr %x %x",addr+4,u_mt48lc4m16.Bank0[addr+4]);
+	$display("addr %x %x",addr+5,u_mt48lc4m16.Bank0[addr+5]);
+	$display("addr %x %x",addr+6,u_mt48lc4m16.Bank0[addr+6]);
+	$display("addr %x %x",addr+7,u_mt48lc4m16.Bank0[addr+7]);
 end
 endtask
 
