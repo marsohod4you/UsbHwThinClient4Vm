@@ -182,7 +182,7 @@ reg [APP_AW:0]           req_addr_int;
 reg [APP_RW-1:0]         req_len_int;
 
 always @(*) begin
-   if(sdr_width == 2'b00) begin // 32 Bit SDR Mode
+   if(sdr_width == 2'b00 || APP_DW==SDR_DW) begin // 32 Bit SDR Mode
       req_addr_int     = {1'b0,req_addr};
       req_len_int      = req_len;
    end else if(sdr_width == 2'b01) begin // 16 Bit SDR Mode

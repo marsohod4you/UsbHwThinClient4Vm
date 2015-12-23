@@ -130,7 +130,7 @@ assign  app_last_wr = x2a_wrlast;
 assign  app_last_rd = x2a_rdlast;
 
 always @(*) begin
-        if(sdr_width == 2'b00) // 32 Bit SDR Mode
+        if(sdr_width == 2'b00 ) // 32 Bit SDR Mode
           begin
             a2x_wrdt             = app_wr_data;
             a2x_wren_n           = app_wr_en_n;
@@ -142,16 +142,18 @@ always @(*) begin
         begin
            // Changed the address and length to match the 16 bit SDR Mode
             app_wr_next          = (x2a_wrnext & wr_xfr_count[0]);
-            app_rd_valid         = (x2a_rdok & rd_xfr_count[0]);
-            if(wr_xfr_count[0] == 1'b1)
+            
+            if(wr_xfr_count[0] == 1'b1 && (APP_DW==32) )
               begin
                 a2x_wren_n      = app_wr_en_n[3:2];
                 a2x_wrdt        = app_wr_data[31:16];
+				app_rd_valid    = (x2a_rdok & rd_xfr_count[0]);
               end
             else
               begin
                 a2x_wren_n      = app_wr_en_n[1:0];
                 a2x_wrdt        = app_wr_data[15:0];
+				app_rd_valid    = x2a_rdok;
               end
             
             app_rd_data = {x2a_rddt,saved_rd_data[15:0]};
@@ -160,17 +162,21 @@ always @(*) begin
            // Changed the address and length to match the 16 bit SDR Mode
             app_wr_next         = (x2a_wrnext & (wr_xfr_count[1:0]== 2'b11));
             app_rd_valid        = (x2a_rdok &   (rd_xfr_count[1:0]== 2'b11));
-            if(wr_xfr_count[1:0] == 2'b11)
-            begin
-                a2x_wren_n      = app_wr_en_n[3];
-                a2x_wrdt        = app_wr_data[31:24];
-            end
-            else if(wr_xfr_count[1:0] == 2'b10)
-            begin
-                a2x_wren_n      = app_wr_en_n[2];
-                a2x_wrdt        = app_wr_data[23:16];
-            end
-            else if(wr_xfr_count[1:0] == 2'b01)
+				if(APP_DW==32)
+				begin
+					if(wr_xfr_count[1:0] == 2'b11)
+					begin
+						 a2x_wren_n      = app_wr_en_n[3];
+						 a2x_wrdt        = app_wr_data[31:24];
+					end
+					else if(wr_xfr_count[1:0] == 2'b10)
+					begin
+						 a2x_wren_n      = app_wr_en_n[2];
+						 a2x_wrdt        = app_wr_data[23:16];
+					end
+				end
+            else 
+				if(wr_xfr_count[1:0] == 2'b01)
             begin
                 a2x_wren_n      = app_wr_en_n[1];
                 a2x_wrdt        = app_wr_data[15:8];

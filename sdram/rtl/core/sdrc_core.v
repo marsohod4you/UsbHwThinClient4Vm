@@ -266,7 +266,7 @@ end
    // This module takes requests from the app, chops them to burst booundaries
    // if wrap=0, decodes the bank and passe the request to bank_ctl
 
-sdrc_req_gen #(.SDR_DW(SDR_DW) , .SDR_BW(SDR_BW)) u_req_gen (
+sdrc_req_gen #( .APP_DW(APP_DW), .APP_BW(APP_BW), .SDR_DW(SDR_DW), .SDR_BW(SDR_BW)) u_req_gen (
           .clk                (clk          ),
           .reset_n            (reset_n            ),
 	  .cfg_colbits        (cfg_colbits        ),
@@ -362,7 +362,7 @@ sdrc_bank_ctl #(.SDR_DW(SDR_DW) ,  .SDR_BW(SDR_BW)) u_bank_ctl (
    // burst terminate if not at the end of a burst and another command to this
    // bank is not available.
 
-sdrc_xfr_ctl #(.SDR_DW(SDR_DW) ,  .SDR_BW(SDR_BW)) u_xfr_ctl (
+sdrc_xfr_ctl #( .SDR_DW(SDR_DW) ,  .SDR_BW(SDR_BW)) u_xfr_ctl (
           .clk                (clk          ),
           .reset_n            (reset_n            ),
 			    
@@ -437,7 +437,7 @@ sdrc_xfr_ctl #(.SDR_DW(SDR_DW) ,  .SDR_BW(SDR_BW)) u_xfr_ctl (
    //     During Read Phase, This block does the re-packing based on SDRAM
    //     Width
    //---------------------------------------------------------------------------
-sdrc_bs_convert #(.SDR_DW(SDR_DW) ,  .SDR_BW(SDR_BW)) u_bs_convert (
+sdrc_bs_convert #( .APP_DW(APP_DW), .APP_BW(APP_BW), .SDR_DW(SDR_DW), .SDR_BW(SDR_BW)) u_bs_convert (
           .clk                (clk          ),
           .reset_n            (reset_n            ),
           .sdr_width          (sdr_width          ),
