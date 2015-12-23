@@ -15,7 +15,7 @@ DWORD dwNumBytesRead;
 unsigned char byInputBuffer[1024]; // Buffer to hold data read from the FT2232H
 DWORD dwNumBytesSent;
 DWORD dwNumBytesToSend;
-unsigned char byOutputBuffer[1024]; // Buffer to hold MPSSE commands and data to be sent to the FT2232H
+unsigned char byOutputBuffer[1024*16]; // Buffer to hold MPSSE commands and data to be sent to the FT2232H
 int ft232H = 0; // High speed device (FTx232H) found. Default - full speed, i.e. FT2232D
 DWORD dwClockDivisor = 0;
 DWORD dwCount;
@@ -185,14 +185,14 @@ int _tmain(int argc, _TCHAR* argv[])
 		ppixels = ppixels - stride*(height-1);
 	}
 
-	int top = 32;
-	int left = 64;
-	int lenp = 16;
+	int top  = 0;
+	int left = 0;
+	int lenp = 256;
 
-	byOutputBuffer[0]=lenp/2;
-	byOutputBuffer[1]=0x00;
-	byOutputBuffer[2]=0x00;
-	byOutputBuffer[3]=0x00;
+	byOutputBuffer[0]=lenp&0xFF;
+	byOutputBuffer[1]=lenp>>8;
+	byOutputBuffer[2]=0x55;
+	byOutputBuffer[3]=0xaa;
 	byOutputBuffer[4]=0x00;
 	byOutputBuffer[5]=0x40;
 	byOutputBuffer[6]=0x00;
@@ -201,14 +201,21 @@ int _tmain(int argc, _TCHAR* argv[])
 	//	byOutputBuffer[8+i] = (i&1) ? 0:0xFF;
 
 
-	for(int x=0; x<32; x++)
+	for(int x=0; x<(1280/lenp); x++)
 	{
-		for(int y=0; y<400; y++)
+		for(int y=0; y<720; y++)
 		{
 			get_hicolor_line( (unsigned short*)&byOutputBuffer[8],ppixels+stride*y+lenp*3*x,lenp);
-
+			/*
+			for(int k=0; k<lenp; k++)
+			{
+				byOutputBuffer[8+k*2+0]=0x00;
+				byOutputBuffer[8+k*2+1]=0xf8;
+			}
+			*/
+			int yy = 719-y;
 			unsigned int* paddr = (unsigned int*)&byOutputBuffer[4];
-			paddr[0] = (y+top)*1024*4+left+x*lenp/2;
+			paddr[0] = (yy+top)*1024*4+left+x*lenp;
 			FT_Write(ftHandle, byOutputBuffer, lenp*2+8, &dwNumBytesSent);
 		}
 	}
