@@ -121,7 +121,7 @@ empty will place the FIFO in an undefined state.
 
 
 module generic_fifo_dc_gray(	rd_clk, wr_clk, rst, clr, din, we,
-		dout, re, full, empty, wr_level, rd_level );
+		dout, rd, full, empty, wr_level, rd_level );
 
 parameter dw=16;
 parameter aw=8;
@@ -130,12 +130,13 @@ input			rd_clk, wr_clk, rst, clr;
 input	[dw-1:0]	din;
 input			we;
 output	[dw-1:0]	dout;
-input			re;
+input			rd;
 output			full; 
 output			empty;
 output	[1:0]		wr_level;
 output	[1:0]		rd_level;
 
+wire re; assign re = rd & (~empty);
 ////////////////////////////////////////////////////////////////////
 //
 // Local Wires
