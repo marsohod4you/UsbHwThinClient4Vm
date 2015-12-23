@@ -8,7 +8,7 @@ module ftdi(
 	input wire  mem_data_next,
 	output wire [24:0]mem_wr_addr,
 	output reg  mem_wr_req,
-	output reg [31:0]mem_wr_data,
+	output wire [15:0]mem_wr_data,
 	
 	input wire  ft_clk,	//from ftdi chip
 	input wire  ft_rxf,	//when low , data is available in the FIFO which can be read by driving RD# low
@@ -16,18 +16,20 @@ module ftdi(
 	input wire  [7:0]ft_data, //data from ftdi chip
 	output wire ft_oe,
 	output wire ft_rd,
-	output wire ft_wr
+	output wire ft_wr,
+	output wire dbg
 );
 
-localparam STATE_READ_CMD  		= 0;
-localparam STATE_READ_CMD_GET  	= 1;
-localparam STATE_READ_ADDR 		= 2;
-localparam STATE_READ_ADDR_GET 	= 3;
-localparam STATE_COPY_BLK_ 		= 4;
-localparam STATE_COPY_BLK  		= 5;
+localparam CMD_SIGNATURE		= 16'hAA55;
+localparam STATE_READ_CMD_BYTE	= 0;
+localparam STATE_READ_ADDR_BYTE	= 1;
+localparam STATE_READ_PIX_BYTE 	= 2;
+localparam STATE_COPY_BLK 		= 3;
 
 assign mem_wr_addr = addr[24:0];
+assign mem_wr_data = wr_word;
 assign ft_wr = 1'b1;
+assign dbg = (wr_data_cnt>8);
 
 reg [2:0]_rst;
 always @(posedge mem_clk)
@@ -49,61 +51,29 @@ always @(posedge ft_clk or posedge ft_reset)
 	if(ft_reset)
 		make_req_sr <= 2'b11;
 	else
-		make_req_sr <= { make_req_sr[0], ~(~ft_rxf & (w_wr_level<2'b11)) };
+		make_req_sr <= { make_req_sr[0], ~( (~ft_rxf) & (w_wr_level<2'b11)) };
 
 assign ft_oe = make_req_sr[0];
 assign ft_rd = make_req_sr[1];
+wire   fifo_wr; assign fifo_wr = ~(ft_rxf | ft_rd);
 
-wire byte_from_ftdi_ready; assign byte_from_ftdi_ready = ~(ft_rxf | ft_rd | ft_oe);
-reg _byte_from_ftdi_ready;
-always @(posedge ft_clk or posedge ft_reset)
-	if(ft_reset)
-		_byte_from_ftdi_ready <= 1'b0;
-	else
-		_byte_from_ftdi_ready <= byte_from_ftdi_ready;
-
-reg [31:0]dword_from_ftdi;
-reg [1:0]fifo_bytes_cnt;
-wire fifo_wr; assign fifo_wr = (fifo_bytes_cnt == 2'b00) & _byte_from_ftdi_ready;
-
-always @(posedge ft_clk or posedge ft_reset)
-	if(ft_reset)
-	begin
-		dword_from_ftdi <= 0;
-		fifo_bytes_cnt  <= 0;
-	end
-	else
-	if(byte_from_ftdi_ready)
-	begin
-		dword_from_ftdi <= { ft_data, dword_from_ftdi[31:8] };
-		fifo_bytes_cnt  <= fifo_bytes_cnt+1;
-	end
-
-wire [31:0]w_fifo_outdata;
+wire [7:0]w_fifo_outdata;
 wire w_fifo_empty;
 wire [1:0]w_rd_level;
-wire w_read_fifo; assign w_read_fifo = 
-	(mem_data_next & suspend_mem_req ) | 
-	(mem_ack & mem_wr_req) | 
-	((state==STATE_READ_CMD | state==STATE_READ_ADDR) & (~w_fifo_empty) );
-
-always @(posedge mem_clk)
-	if(w_read_fifo)
-		mem_wr_data <= w_fifo_outdata;
-
-`define  __ICARUS__X 1
+wire w_read_fifo; assign w_read_fifo =  
+	(w_read_addr_byte | w_read_pix_byte | w_read_cmd_byte );
 
 //we need fifo for synchronizing FTDI clock to memory clock
-`ifdef __ICARUS__X 
-generic_fifo_dc_gray #( .dw(32), .aw(4) ) u_ftdi_fifo(
+`ifdef __ICARUS__
+generic_fifo_dc_gray #( .dw(8), .aw(4) ) u_ftdi_fifo(
+	.rst(~reset),
 	.rd_clk(mem_clk),
 	.wr_clk(ft_clk),
-	.rst(~reset),
 	.clr(),
-	.din(dword_from_ftdi),
+	.din(ft_data),
 	.we(fifo_wr),
 	.dout(w_fifo_outdata),
-	.re(w_read_fifo),
+	.rd(w_read_fifo),
 	.full(),
 	.empty(w_fifo_empty),
 	.wr_level(w_wr_level),
@@ -115,7 +85,7 @@ wire [3:0]w_rdusedw;
 wire [3:0]w_wrusedw;
 wrfifo u_wrfifo(
 	.aclr(reset),
-	.data(dword_from_ftdi),
+	.data(ft_data),
 	.rdclk(mem_clk),
 	.rdreq(w_read_fifo),
 	.wrclk(ft_clk),
@@ -129,73 +99,115 @@ assign w_wr_level = w_wrusedw[3:2];
 assign w_rd_level = w_wrusedw[3:2] ^ 2'b11;
 `endif
 
-reg [15:0]byte_counter;
-
 reg [7:0]state;
 
-reg  [31:0]cmd;
-wire [7:0]len; assign len = cmd[7:0];
+//fetching command (4 bytes) from FIFO
+reg  [31:0]cmd=0;
+wire w_read_cmd_byte; assign w_read_cmd_byte = ~w_fifo_empty & (state==STATE_READ_CMD_BYTE) & ~sign_ok & mem_idle;
+reg  r_read_cmd_byte;
+wire [15:0]cmd_sign; assign cmd_sign = { w_fifo_outdata,cmd[31:24] }; //expect signature in hi-word
+wire sign_ok; assign sign_ok = (cmd_sign==CMD_SIGNATURE && r_read_cmd_byte );
+wire [15:0]len; 	 assign len = cmd[15:0];
 always @(posedge mem_clk)
-	if( state==STATE_READ_CMD_GET )
-		cmd  <= w_fifo_outdata;
+begin
+	r_read_cmd_byte <= w_read_cmd_byte;
+	if( r_read_cmd_byte )
+		cmd  <= { w_fifo_outdata, cmd[31:8]};
+end
 
-reg [31:0]addr;
+//fetching address from FIFO
+reg [31:0]addr = 0;
+//count fetched address bytes (need 4 bytes)
+reg [1:0]num_addr_bytes = 0;
 always @(posedge mem_clk)
-	if( state==STATE_READ_ADDR_GET )
-		addr <= w_fifo_outdata;
+	if( r_read_addr_byte )
+		num_addr_bytes <= num_addr_bytes + 1;
+	else
+	if( state==STATE_READ_CMD_BYTE )
+		num_addr_bytes <= 2'b00;
+
+//fetch address byte
+wire w_read_addr_byte; assign w_read_addr_byte = ~w_fifo_empty & (state==STATE_READ_ADDR_BYTE) & ~addr_ok;
+reg  r_read_addr_byte = 1'b0;
+wire addr_ok; assign addr_ok = (num_addr_bytes==2'b11 && r_read_addr_byte );
+always @(posedge mem_clk)
+begin
+	r_read_addr_byte <= w_read_addr_byte;
+	if( r_read_addr_byte )
+		addr <= { w_fifo_outdata, addr[31:8]};
 	else
 	if( state==STATE_COPY_BLK && mem_ack )
-		addr <= addr + 4;
-		
-reg [7:0]wr_data_cnt;
+		addr <= addr + 1;
+end
+
+//fetching pixel DWORD from FIFO
+reg [15:0]pixel = 0;
+//count fetched pixel bytes (need 4 bytes)
+reg num_pix_bytes = 1'b0;
 always @(posedge mem_clk)
-	if( state==STATE_READ_ADDR )
+	if( r_read_pix_byte )
+		num_pix_bytes <= num_pix_bytes + 1;
+	else
+	if( state==STATE_READ_ADDR_BYTE )
+		num_pix_bytes <= 1'b0;
+
+//fetch pixels byte
+wire w_read_pix_byte; assign w_read_pix_byte = ~w_fifo_empty & (state==STATE_READ_PIX_BYTE) & ~pixel_ok;
+reg  r_read_pix_byte = 1'b0;
+wire pixel_ok; assign pixel_ok = (num_pix_bytes==1'b1 && r_read_pix_byte);
+always @(posedge mem_clk)
+begin
+	r_read_pix_byte <= w_read_pix_byte;
+	if( r_read_pix_byte )
+		pixel <= { w_fifo_outdata, pixel[15:8]};
+end
+
+reg [7:0]wr_data_cnt = 0;
+always @(posedge mem_clk)
+	if( state==STATE_READ_ADDR_BYTE )
 		wr_data_cnt <= 0;
 	else
-	if( state==STATE_COPY_BLK & mem_data_next )
+	if( write_accepted )
 		wr_data_cnt <= wr_data_cnt + 1;
 
-reg suspend_mem_req;
-always @(posedge mem_clk)
-	if( state==STATE_READ_ADDR || wr_data_cnt[1:0]==2'b11 )
-		suspend_mem_req <= 1'b0;
-	else
-	if( mem_wr_req & mem_ack )
-		suspend_mem_req <= 1'b1;
-		
-always @(posedge mem_clk)
-	if( state==STATE_COPY_BLK )
-		mem_wr_req <= mem_idle & (w_rd_level!=2'b11) & (len!=0) & (~mem_ack) & (~suspend_mem_req) & (wr_data_cnt!=len) & (wr_data_cnt!=(len-1));
-	else
+always @(posedge mem_clk or posedge reset)
+	if(reset)
 		mem_wr_req <= 1'b0;
+	else
+	if(mem_ack)
+		mem_wr_req <= 1'b0;
+	else
+	if(pixel_ok)
+		mem_wr_req <= 1'b1;
+	
+reg [15:0]wr_word = 0;	
+wire write_accepted; assign write_accepted = mem_ack & mem_wr_req;
+always @(posedge mem_clk)
+	if(write_accepted)
+		wr_word <= pixel;
 
 always @(posedge mem_clk or posedge reset)
 	if(reset)
 	begin
-		state <= STATE_READ_CMD;
+		state <= STATE_READ_CMD_BYTE;
 	end
 	else
 	case(state)
-		STATE_READ_CMD: begin
-			if(~w_fifo_empty)
-				state <= STATE_READ_CMD_GET;
+		STATE_READ_CMD_BYTE: begin
+			if(sign_ok)
+				state <= STATE_READ_ADDR_BYTE;
 			end
-		STATE_READ_CMD_GET: begin
-				state <= STATE_READ_ADDR;
+		STATE_READ_ADDR_BYTE: begin
+			if(addr_ok)
+				state <= STATE_READ_PIX_BYTE;
 			end
-		STATE_READ_ADDR: begin
-			if(~w_fifo_empty)
-				state <= STATE_READ_ADDR_GET;
-			end
-		STATE_READ_ADDR_GET: begin
-				state <= STATE_COPY_BLK_;
-			end
-		STATE_COPY_BLK_: begin
+		STATE_READ_PIX_BYTE: begin
+			if(pixel_ok)
 				state <= STATE_COPY_BLK;
 			end
 		STATE_COPY_BLK: begin
-			if(wr_data_cnt==len)
-				state <= STATE_READ_CMD;
+			if( write_accepted )
+				state <= (wr_data_cnt==len-1) ? STATE_READ_CMD_BYTE : STATE_READ_PIX_BYTE;
 			end
 	endcase
 
@@ -222,8 +234,8 @@ always @(posedge clk_60Mhz)
 	if( ~ft_oe & ~ft_rd )
 		if(out_addr<39)
 			out_addr <= out_addr + 1;
-		else
-			out_addr <= 0;
+		//else
+			//out_addr <= 0;
 		
 reg clk_60Mhz = 1'b0;
 always
@@ -237,8 +249,8 @@ begin
 	//fill ftdi initial content with some data
 	ftdi_test_content[0] = 8; //CMD&LEN
 	ftdi_test_content[1] = 0;
-	ftdi_test_content[2] = 0;
-	ftdi_test_content[3] = 0;
+	ftdi_test_content[2] = 8'h55;
+	ftdi_test_content[3] = 8'hAA;
 	
 	ftdi_test_content[4] = 16; //WR ADDRESS
 	ftdi_test_content[5] = 0;
