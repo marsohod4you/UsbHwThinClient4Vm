@@ -130,7 +130,7 @@ sdrc_core #( .APP_DW(16), .APP_BW(2), .SDR_DW(16), .SDR_BW(2) )
 		/* Parameters */
 		.sdr_width			(2'b01 ),
 		.cfg_colbits        (2'b00              ), //2'b00 means 8 Bit Column Address
-		.cfg_req_depth      (2'h3               ), //how many req. buffer should hold
+		.cfg_req_depth      (2'h1               ), //how many req. buffer should hold
 		.cfg_sdr_en         (1'b1               ),
 		.cfg_sdr_mode_reg   (12'h223            ), //single location write, 8 words read
 		.cfg_sdr_tras_d     (4'h4               ), //SDRAM active to precharge, specified in clocks
@@ -159,7 +159,7 @@ hvsync u_hvsync(
 
 	.pixel_count(w_pixel_count),
 	.line_count(w_line_count),
-	.dbg( LED[0] )
+	.dbg( )
 	);
 
 wire [1:0]w_wr_level;
@@ -191,6 +191,7 @@ videomem_init u_videomem_init(
 	);
 */
 wire w_ft_dbg;
+wire w_ft_wr_req;
 
 ftdi u_ftdi(
 	.rst( (~w_sdr_init_done) | (~(KEY0&KEY1))),
@@ -199,7 +200,7 @@ ftdi u_ftdi(
 	.mem_ack(app_req_ack & (~app_rd_req) ),
 	.mem_data_next(app_wr_next_req),
 	.mem_wr_addr(w_wr_addr),
-	.mem_wr_req(w_wr_req),
+	.mem_wr_req(w_ft_wr_req),
 	.mem_wr_data(app_wr_data),
 	.ft_clk( ft_clk ),
 	.ft_rxf( ft_rxf ),
@@ -211,9 +212,15 @@ ftdi u_ftdi(
 	.dbg( w_ft_dbg)
 );
 
+assign w_wr_req = w_ft_wr_req & ~(app_rd_req | app_rd_valid_f[0] | app_rd_valid);
+
 wire [15:0]w_fifo_out;
 wire w_fifo_empty;
 wire w_fifo_read; assign w_fifo_read = w_active & ~w_fifo_empty;
+
+reg [1:0]app_rd_valid_f;
+always @(posedge w_mem_clk)
+	app_rd_valid_f <= { app_rd_valid_f[0],app_rd_valid };
 
 `ifdef __ICARUS__ 
 generic_fifo_dc_gray #( .dw(16), .aw(8) ) u_generic_fifo_dc_gray (
@@ -245,14 +252,14 @@ vfifo u_vfifo(
 	.wrusedw(usedw)
 	);
 
-assign w_wr_level =  (usedw>=196) ? 2'b11 :
-							(usedw>=128) ? 2'b10 :
-							(usedw>=64)  ? 2'b01 : 2'b00;
+assign w_wr_level = (usedw>=224) ? 2'b11 :
+							(usedw>=196) ? 2'b10 :
+							(usedw>=128)  ? 2'b01 : 2'b00;
 `endif
 
 reg [15:0]out_word;
 always @(posedge w_video_clk)
-	if(w_active)
+	if(d_active)
 		out_word <= w_fifo_out[15:0];
 	else
 		out_word <= 16'h0;
@@ -268,9 +275,7 @@ begin
 	d_active  <= w_active;
 end
 
-assign LED[7:3] = 0;
-assign LED[1] = KEY0;
-assign LED[2] = w_ft_dbg;
+assign LED[7:0] = 0;
 
 `ifdef HDMI
 wire w_tmds_bh;
