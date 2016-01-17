@@ -46,16 +46,17 @@ always @(posedge ft_clk)
 wire [1:0]w_wr_level;
 
 //think to read from FTDI if it has data AND our FIFO is not full
+wire fifo_has_space;
 reg  [1:0]make_req_sr;
 always @(posedge ft_clk or posedge ft_reset)
 	if(ft_reset)
 		make_req_sr <= 2'b11;
 	else
-		make_req_sr <= { make_req_sr[0], ~( (~ft_rxf) & (w_wr_level<2'b11)) };
+		make_req_sr <= { make_req_sr[0], ~( (~ft_rxf) & fifo_has_space) };
 
 assign ft_oe = make_req_sr[0];
 assign ft_rd = make_req_sr[1];
-wire   fifo_wr; assign fifo_wr = ~(ft_rxf | ft_rd);
+wire   fifo_wr; assign fifo_wr = ~(ft_rxf | ft_rd /*| ft_oe*/);
 
 wire [7:0]w_fifo_outdata;
 wire w_fifo_empty;
@@ -79,10 +80,11 @@ generic_fifo_dc_gray #( .dw(8), .aw(4) ) u_ftdi_fifo(
 	.wr_level(w_wr_level),
 	.rd_level(w_rd_level)
 	);
+assign fifo_has_space = (w_wr_level<2'b11);
 `else
 //Quartus native FIFO;
-wire [3:0]w_rdusedw;
-wire [3:0]w_wrusedw;
+wire [8:0]w_rdusedw;
+wire [8:0]w_wrusedw;
 wrfifo u_wrfifo(
 	.aclr(reset),
 	.data(ft_data),
@@ -95,8 +97,7 @@ wrfifo u_wrfifo(
 	.rdusedw(w_rdusedw),
 	.wrusedw(w_wrusedw)
 	);
-assign w_wr_level = w_wrusedw[3:2];
-assign w_rd_level = w_wrusedw[3:2] ^ 2'b11;
+assign fifo_has_space = (w_wrusedw<500);
 `endif
 
 reg [7:0]state;
@@ -247,17 +248,17 @@ reg [7:0]ftdi_test_content[0:255];
 initial
 begin
 	//fill ftdi initial content with some data
-	ftdi_test_content[0] = 8; //CMD&LEN
+	ftdi_test_content[0] = 128; //CMD&LEN
 	ftdi_test_content[1] = 0;
 	ftdi_test_content[2] = 8'h55;
 	ftdi_test_content[3] = 8'hAA;
 	
 	ftdi_test_content[4] = 16; //WR ADDRESS
-	ftdi_test_content[5] = 0;
+	ftdi_test_content[5] = 200;
 	ftdi_test_content[6] = 0;
 	ftdi_test_content[7] = 0;
 	
-	for(i=0; i<32; i=i+1)
+	for(i=0; i<128+8; i=i+1)
 	begin
 		ftdi_test_content[i+8]  = i; //DATA
 	end
