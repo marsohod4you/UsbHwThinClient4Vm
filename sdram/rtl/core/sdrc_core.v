@@ -237,7 +237,6 @@ wire [SDR_BW-1:0]        a2x_wren_n;
 //wire [31:0] app_rd_data;
 wire [SDR_DW-1:0]        x2a_rddt;
 
-
 // synopsys translate_off 
    wire [3:0]           sdr_cmd;
    assign sdr_cmd = {sdr_cs_n, sdr_ras_n, sdr_cas_n, sdr_we_n}; 
@@ -246,7 +245,21 @@ wire [SDR_DW-1:0]        x2a_rddt;
 assign sdr_den_n = sdr_den_n_int ; 
 assign sdr_dout  = sdr_dout_int ;
 
+//hm.. simplify controller but probably broke common functionality..
+reg [APP_DW-1:0]pad_sdr_din_fixed;
+always@(posedge pad_clk)
+	pad_sdr_din_fixed <= pad_sdr_din;
 
+wire read_cmd; assign read_cmd = sdr_ras_n & sdr_we_n & (~sdr_cas_n);
+reg [10:0]read_cmd_pipe;
+always@(posedge pad_clk)
+	read_cmd_pipe <= { read_cmd_pipe[9:0], read_cmd };
+
+assign app_rd_valid = |read_cmd_pipe[10:3];
+wire app_rd_valid_unused;
+wire [SDR_DW-1:0]app_rd_data_unused;
+assign app_rd_data = pad_sdr_din_fixed;
+	
 // To meet the timing at read path, read data is registered w.r.t pad_sdram_clock and register back to sdram_clk
 // assumption, pad_sdram_clk is synhronous and delayed clock of sdram_clk.
 // register w.r.t pad sdram clk
@@ -466,8 +479,8 @@ sdrc_bs_convert #( .APP_DW(APP_DW), .APP_BW(APP_BW), .SDR_DW(SDR_DW), .SDR_BW(SD
           .app_wr_en_n        (app_wr_en_n        ),
           .app_wr_next        (app_wr_next_req    ),
 	  .app_last_wr        (app_last_wr        ),
-          .app_rd_data        (app_rd_data        ),
-          .app_rd_valid       (app_rd_valid       ),
+          .app_rd_data        (app_rd_data_unused ),
+          .app_rd_valid       (app_rd_valid_unused),
 	  .app_last_rd        (app_last_rd        )
 
        );   
