@@ -107,14 +107,17 @@ initial
 	$dumpon;
 	@(posedge u_top.w_sdr_init_done);
 	$display("w_sdr_init_done");
-	@(negedge u_top.app_rd_req);
-	//#20;
+	//@(negedge u_top.app_rd_req);
+	@(posedge u_top.w_active);
+	#10;
+	@(posedge u_top.app_rd_req);
+	#1966;
 	start_emu = 1'b1;
-	#100000;
+	#1000000;
 	print_mem(16);
 	$dumpoff;
 	
-	//$finish;
+	$finish;
 	
 	@(posedge u_top.w_vsync);
 	$display("w_vsync 0");
