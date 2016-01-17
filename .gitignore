@@ -1,8 +1,21 @@
 /db
 /incremental_db
 /output_files
+/greybox_tmp
 *.bak
 *.vcd
 qqq
 PLLJ_PLLSPE_INFO.txt
+cpp/vplayer/Release
+cpp/vplayer/Debug
+cpp/vplayer/vplayer/Release
+cpp/vplayer/vplayer/Debug
+cpp/vplayer/ipch
+cpp/cpp_draw_pict/Release
+cpp/cpp_draw_pict/Debug
+cpp/cpp_draw_pict/ipch
+*.sdf
+*.opensdf
+*.suo
+
 
