@@ -48,7 +48,7 @@ always @(posedge hsync or posedge reset)
 	if(reset)
 	begin
 		vsync <= 1'b0;
-		line_count <= 0;
+		line_count <= vert_addr_time; //0;
 	end
 	else
 	begin
