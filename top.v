@@ -194,7 +194,7 @@ wire w_ft_dbg;
 wire w_ft_wr_req;
 
 ftdi u_ftdi(
-	.rst( (~w_sdr_init_done) | (~(KEY0&KEY1))),
+	.rst( ~w_sdr_init_done ),
 	.mem_clk(w_mem_clk),
 	.mem_idle(~app_rd_req),
 	.mem_ack(app_req_ack & (~app_rd_req) ),
@@ -275,7 +275,8 @@ begin
 	d_active  <= w_active;
 end
 
-assign LED[7:0] = 0;
+assign LED[7:1] = 0;
+assign LED[0] = w_ft_dbg;
 
 `ifdef HDMI
 wire w_tmds_bh;
