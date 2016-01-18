@@ -17,7 +17,7 @@ module ftdi(
 	output wire ft_oe,
 	output wire ft_rd,
 	output wire ft_wr,
-	output wire dbg
+	output reg  dbg
 );
 
 localparam CMD_SIGNATURE		= 16'hAA55;
@@ -29,7 +29,6 @@ localparam STATE_COPY_BLK 		= 3;
 assign mem_wr_addr = addr[24:0];
 assign mem_wr_data = wr_word;
 assign ft_wr = 1'b1;
-assign dbg = (wr_data_cnt>8);
 
 reg [2:0]_rst;
 always @(posedge mem_clk)
@@ -83,8 +82,8 @@ generic_fifo_dc_gray #( .dw(8), .aw(4) ) u_ftdi_fifo(
 assign fifo_has_space = (w_wr_level<2'b11);
 `else
 //Quartus native FIFO;
-wire [8:0]w_rdusedw;
-wire [8:0]w_wrusedw;
+wire [9:0]w_rdusedw;
+wire [9:0]w_wrusedw;
 wrfifo u_wrfifo(
 	.aclr(reset),
 	.data(ft_data),
@@ -97,7 +96,7 @@ wrfifo u_wrfifo(
 	.rdusedw(w_rdusedw),
 	.wrusedw(w_wrusedw)
 	);
-assign fifo_has_space = (w_wrusedw<500);
+assign fifo_has_space = (w_wrusedw<960);
 `endif
 
 reg [7:0]state;
@@ -140,6 +139,10 @@ begin
 	if( state==STATE_COPY_BLK && mem_ack )
 		addr <= addr + 1;
 end
+
+always @(posedge mem_clk)
+	if(addr_ok)
+		dbg <= (len==256);
 
 //fetching pixel DWORD from FIFO
 reg [15:0]pixel = 0;
