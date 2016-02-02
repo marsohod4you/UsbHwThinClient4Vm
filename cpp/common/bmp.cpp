@@ -24,7 +24,7 @@ DWORD dwCount;
 
 int ftdi_init(int idx)
 {
-/*
+
 FT_DEVICE ftDevice; 
 DWORD deviceID; 
 char SerialNumber[16+1]; 
@@ -49,11 +49,11 @@ if (dwNumDevs < 1) // Exit if we don't see any
 }
 
 printf("%d FTDI devices found - the count includes individual ports on a single chip\n", dwNumDevs);
-*/
+
 
 ftHandle=NULL;
 
-dwNumDevs = idx+1;
+//dwNumDevs = idx+1;
 
 //go thru' list of devices
 for(unsigned int i=idx; i<dwNumDevs; i++)
@@ -93,6 +93,8 @@ for(unsigned int i=idx; i<dwNumDevs; i++)
 		FT_Close(ftHandle);
 	}
 }
+
+printf("FT HANDLE %p\n",ftHandle);
 
 if(ftHandle==NULL)
 {
@@ -136,6 +138,22 @@ void get_hicolor_line( unsigned short* pdst16, unsigned char* psrc24, int numpix
 		g = psrc24[1];
 		r = psrc24[2];
 		psrc24+=3;
+
+		unsigned short h = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >>3);
+		*pdst16 = h;
+		pdst16++;
+	}
+}
+
+void get_hicolor_line32( unsigned short* pdst16, unsigned char* psrc32, int numpix)
+{
+	for(int i=0; i<numpix; i++)
+	{
+		unsigned short r,g,b;
+		b = psrc32[0];
+		g = psrc32[1];
+		r = psrc32[2];
+		psrc32+=4;
 
 		unsigned short h = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >>3);
 		*pdst16 = h;
@@ -187,6 +205,68 @@ int write_bmp_to_ftdi(int width, int height, unsigned char* ppixels, int stride)
 			{
 				//time to flush accumulated
 				FT_Write(ftHandle, byOutputBuffer, total_sz, &dwNumBytesSent);
+				total_sz = 0;
+				pdest = byOutputBuffer;
+			}
+		}
+	}
+
+	//flush acumulated
+	if( total_sz )
+	{
+		//time to flush accumulated
+		FT_Write(ftHandle, byOutputBuffer, total_sz, &dwNumBytesSent);
+		total_sz = 0;
+		pdest = byOutputBuffer;
+	}
+	return 0;
+}
+
+int once = 1;
+int write_bmp16_to_ftdi(int width, int height, unsigned char* ppixels, RECT* prect )
+{
+	int stride = width*2;
+
+	//align source rectangle left/right coords
+	prect->left  &= 0xFFF8; 
+	prect->right = (prect->right+7) & 0xFFF8;
+	int rwidth = prect->right-prect->left;
+
+	int lenp = 256;
+	if(lenp>rwidth)
+		lenp=rwidth;
+
+	unsigned char* pdest = byOutputBuffer;
+	int total_sz = 0;
+	
+	for(int y=prect->top; y<prect->bottom; y++)
+	{
+		for(int x=prect->left; x<prect->right; x=x+lenp )
+		{
+			//make header SIGNATURE & Length
+			pdest[0]=lenp&0xFF;
+			pdest[1]=lenp>>8;
+			pdest[2]=0x55;
+			pdest[3]=0xaa;
+
+			//target framebuffer address
+			unsigned int* paddr = (unsigned int*)&pdest[4];
+			paddr[0] = y*1024*4+x;
+
+			memcpy( &pdest[8], ppixels+stride*y+x*2, lenp*2);
+
+			total_sz += lenp*2+8;
+			pdest += lenp*2+8;
+
+			if( total_sz > BUF_SIZE )
+			{
+				//time to flush accumulated
+				FT_STATUS st = FT_Write(ftHandle, byOutputBuffer, total_sz, &dwNumBytesSent);
+				if(st && once)
+				{
+					once=0;
+					printf("fth %p %d \n",ftHandle,st);
+				}
 				total_sz = 0;
 				pdest = byOutputBuffer;
 			}
