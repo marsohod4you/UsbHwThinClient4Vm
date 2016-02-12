@@ -192,6 +192,14 @@ videomem_init u_videomem_init(
 */
 wire w_ft_dbg;
 wire w_ft_wr_req;
+wire w_usb_wr_req;
+wire [15:0]w_usb_wr_data;
+reg [15:0]r_usb_data;
+assign LED[7:0] = r_usb_data;
+
+always @(posedge w_mem_clk)
+	if(w_usb_wr_req)
+		r_usb_data <= w_usb_wr_data[7:0];
 
 ftdi u_ftdi(
 	.rst( ~w_sdr_init_done ),
@@ -202,6 +210,8 @@ ftdi u_ftdi(
 	.mem_wr_addr(w_wr_addr),
 	.mem_wr_req(w_ft_wr_req),
 	.mem_wr_data(app_wr_data),
+	.usb_wr_data(w_usb_wr_data),
+	.usb_wr_req(w_usb_wr_req),
 	.ft_clk( ft_clk ),
 	.ft_rxf( ft_rxf ),
 	.ft_txe( ft_tfx ),
@@ -274,9 +284,6 @@ begin
 	r_vsync <= w_vsync;
 	d_active  <= w_active;
 end
-
-assign LED[7:1] = 0;
-assign LED[0] = w_ft_dbg;
 
 `ifdef HDMI
 wire w_tmds_bh;

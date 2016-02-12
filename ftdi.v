@@ -9,6 +9,9 @@ module ftdi(
 	output wire [24:0]mem_wr_addr,
 	output reg  mem_wr_req,
 	output wire [15:0]mem_wr_data,
+
+	output wire [15:0]usb_wr_data,
+	output wire usb_wr_req,
 	
 	input wire  ft_clk,	//from ftdi chip
 	input wire  ft_rxf,	//when low , data is available in the FIFO which can be read by driving RD# low
@@ -25,9 +28,12 @@ localparam STATE_READ_CMD_BYTE	= 0;
 localparam STATE_READ_ADDR_BYTE	= 1;
 localparam STATE_READ_PIX_BYTE 	= 2;
 localparam STATE_COPY_BLK 		= 3;
+localparam STATE_WRITE_USB		= 4;
 
 assign mem_wr_addr = addr[24:0];
 assign mem_wr_data = wr_word;
+assign usb_wr_data = pixel;
+assign usb_wr_req  = (state==STATE_WRITE_USB);
 assign ft_wr = 1'b1;
 
 reg [2:0]_rst;
@@ -117,6 +123,8 @@ end
 
 //fetching address from FIFO
 reg [31:0]addr = 0;
+wire addr_is_mem = ~addr[31];
+wire addr_is_usb =  addr[31];
 //count fetched address bytes (need 4 bytes)
 reg [1:0]num_addr_bytes = 0;
 always @(posedge mem_clk)
@@ -181,7 +189,7 @@ always @(posedge mem_clk or posedge reset)
 	if(mem_ack)
 		mem_wr_req <= 1'b0;
 	else
-	if(pixel_ok)
+	if(pixel_ok & addr_is_mem)
 		mem_wr_req <= 1'b1;
 	
 reg [15:0]wr_word = 0;	
@@ -206,12 +214,18 @@ always @(posedge mem_clk or posedge reset)
 				state <= STATE_READ_PIX_BYTE;
 			end
 		STATE_READ_PIX_BYTE: begin
-			if(pixel_ok)
+			if(pixel_ok & addr_is_mem)
 				state <= STATE_COPY_BLK;
+			else
+			if(pixel_ok & addr_is_usb)
+				state <= STATE_WRITE_USB;
 			end
 		STATE_COPY_BLK: begin
 			if( write_accepted )
 				state <= (wr_data_cnt==len-1) ? STATE_READ_CMD_BYTE : STATE_READ_PIX_BYTE;
+			end
+		STATE_WRITE_USB: begin
+				state <= STATE_READ_CMD_BYTE;
 			end
 	endcase
 
