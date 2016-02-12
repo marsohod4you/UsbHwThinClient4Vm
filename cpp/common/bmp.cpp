@@ -5,7 +5,7 @@
 #include <string.h>
 #include <windows.h>
 #include "atlimage.h"
-#include "ftd2xx.h"
+#include "bmp.h"
 
 FT_HANDLE ftHandle; // Handle of the FTDI device
 FT_STATUS ftStatus; // Result of each D2XX call
@@ -283,4 +283,14 @@ int write_bmp16_to_ftdi(int width, int height, unsigned char* ppixels, RECT* pre
 	}
 
 	return 0;
+}
+
+FT_STATUS FtRawWrite(unsigned char* sbuffer, unsigned long size, unsigned long* psent )
+{
+	return FT_Write( ftHandle, sbuffer, size, psent );
+}
+
+FT_STATUS FtRawRead(unsigned char* rbuffer, unsigned long size, unsigned long* pgot )
+{
+	return FT_Read( ftHandle, rbuffer, size, pgot );
 }
