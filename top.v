@@ -38,6 +38,11 @@ module top
 		output wire ft_wr,
 		output wire ft_oe,
 		
+		inout wire USB0_DM,
+		inout wire USB0_DP,
+		inout wire USB1_DM,
+		inout wire USB1_DP,
+		
 		input wire KEY0,
 		input wire KEY1
 	   );
@@ -337,5 +342,11 @@ hdmi u_hdmi(
 	assign VGA_HSYNC = r_hsync;
 	assign VGA_VSYNC = r_vsync;
 `endif
+
+//
+assign USB0_DM = 1'bz;
+assign USB0_DP = 1'bz;
+assign USB1_DM = 1'bz;
+assign USB1_DP = 1'bz;
 
 endmodule
