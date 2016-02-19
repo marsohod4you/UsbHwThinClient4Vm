@@ -15,7 +15,7 @@ module usb11_recv(
 	output reg [7:0]rdata,
 	output reg [3:0]rbyte_cnt,
 	output reg rdata_ready,
-	output wire eop_rfe //receive EOP falling edge
+	output wire end_of_recv
 	);
 
 //fix current USB line values
@@ -34,7 +34,10 @@ end
 assign eop_r  = ~( |dp_fixed | |dm_fixed);
 
 //find edge of receive EOP
-assign eop_rfe = receiver_enabled & (eop_r);
+reg eop_r_fixed;
+always @(posedge clk)
+	eop_r_fixed <= eop_r;
+assign end_of_recv = eop_r_fixed & (~eop_r);
 
 //logic for enabling/disabling receiver
 reg receiver_enabled;
@@ -154,7 +157,7 @@ begin
 		rbyte_cnt <= 0;
 	else
 	begin
-		if(eop_rfe)
+		if(end_of_recv)
 			rbyte_cnt <= 0;
 		else
 		if(rdata_ready)
