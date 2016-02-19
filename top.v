@@ -197,14 +197,55 @@ videomem_init u_videomem_init(
 */
 wire w_ft_dbg;
 wire w_ft_wr_req;
+
 wire w_usb_wr_req;
 wire [15:0]w_usb_wr_data;
+
+wire [15:0]w_usb_result;
+wire w_usb_result_rdy;
+wire w_usb_result_rd;
+
 reg [15:0]r_usb_data;
 assign LED[7:0] = r_usb_data;
-
 always @(posedge w_mem_clk)
 	if(w_usb_wr_req)
 		r_usb_data <= w_usb_wr_data[7:0];
+
+wire w_usb0_dp;
+wire w_usb0_dm;
+wire w_usb0_out;
+wire w_usb1_dp;
+wire w_usb1_dm;
+wire w_usb1_out;
+		
+usb11_ctrl u_usb11_ctrl(
+	.reset( ~w_sdr_init_done ),
+	.clk_60Mhz(ft_clk),
+	
+	.usb0_dp_in(USB0_DP),
+	.usb0_dm_in(USB0_DM),
+	.usb0_dp_out(w_usb0_dp),
+	.usb0_dm_out(w_usb0_dm),
+	.usb0_out(w_usb0_out),
+	
+	.usb1_dp_in(USB1_DP),
+	.usb1_dm_in(USB1_DM),
+	.usb1_dp_out(w_usb1_dp),
+	.usb1_dm_out(w_usb1_dm),
+	.usb1_out(w_usb1_out),
+	
+	.clk(w_mem_clk),
+	.data_in(w_usb_wr_data[7:0]),
+	.data_in_wr(w_usb_wr_req),
+	.data_out_rd(w_usb_result_rd),
+	.data_out(w_usb_result),
+	.data_out_rdy(w_usb_result_rdy)
+);
+
+assign USB0_DP = w_usb0_out ? w_usb0_dp : 1'bz;
+assign USB0_DM = w_usb0_out ? w_usb0_dm : 1'bz;
+assign USB1_DP = w_usb1_out ? w_usb1_dp : 1'bz;
+assign USB1_DM = w_usb1_out ? w_usb1_dm : 1'bz;
 
 ftdi u_ftdi(
 	.rst( ~w_sdr_init_done ),
