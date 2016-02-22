@@ -204,9 +204,11 @@ wire [15:0]w_usb_wr_data;
 wire [15:0]w_usb_result;
 wire w_usb_result_rdy;
 wire w_usb_result_rd;
+wire w_udbg;
 
 reg [15:0]r_usb_data;
-assign LED[7:0] = r_usb_data;
+assign LED[6:0] = r_usb_data;
+assign LED[7]=w_udbg;
 always @(posedge w_mem_clk)
 	if(w_usb_wr_req)
 		r_usb_data <= w_usb_wr_data[7:0];
@@ -235,11 +237,12 @@ usb11_ctrl u_usb11_ctrl(
 	.usb1_out(w_usb1_out),
 	
 	.clk(w_mem_clk),
-	.data_in(w_usb_wr_data[7:0]),
+	.data_in(w_usb_wr_data),
 	.data_in_wr(w_usb_wr_req),
 	.data_out_rd(w_usb_result_rd),
 	.data_out(w_usb_result),
-	.data_out_rdy(w_usb_result_rdy)
+	.data_out_rdy(w_usb_result_rdy),
+	.dbg(w_udbg)
 );
 
 assign USB0_DP = w_usb0_out ? w_usb0_dp : 1'bz;
@@ -258,15 +261,19 @@ ftdi u_ftdi(
 	.mem_wr_data(app_wr_data),
 	.usb_wr_data(w_usb_wr_data),
 	.usb_wr_req(w_usb_wr_req),
+	.usb_result_rdy(w_usb_result_rdy),
+	.usb_result_rd(w_usb_result_rd),
 	.ft_clk( ft_clk ),
 	.ft_rxf( ft_rxf ),
-	.ft_txe( ft_tfx ),
+	.ft_txe( ft_txe ),
 	.ft_data(ft_d ),
 	.ft_oe(  ft_oe ),
 	.ft_rd(  ft_rd ),
 	.ft_wr(  ft_wr ),
 	.dbg( w_ft_dbg)
 );
+
+assign ft_d = ft_wr ? 8'hzz : w_usb_result[7:0];
 
 assign w_wr_req = w_ft_wr_req & ~(app_rd_req | app_rd_valid_f[0] | app_rd_valid);
 

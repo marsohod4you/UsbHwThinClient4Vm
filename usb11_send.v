@@ -63,7 +63,7 @@ always @*
 begin
 	sbit = (prev_sbit ^ (!send_reg[0]) ^ (six_ones & send_reg[0])) & sending_pkt;
 	se0 = !(sending_pkt ^ (sending_pkt | sending_pkt_prev[1]));
-	show_next = (bit_count==3'b001) & sending_bit & sending_pkt & (!last);
+	show_next = (bit_count==3'b001) & sending_bit & sending_pkt & (~last) & (~err_too_long);
 	pkt_end = ~bus_enable & sending_pkt_prev[4] & bit_impulse;
 end
 
@@ -162,5 +162,20 @@ always @( posedge clk )
 	else
 	if(sending_bit)
 		send_reg <= {1'b0, send_reg[7:1]}; 	//shift out byte
+
+reg [7:0]sbyte_cnt;
+reg err_too_long;
+always @( posedge clk )
+	if( eof )
+	begin
+		sbyte_cnt <= 0;
+		err_too_long<=0;
+	end
+	else
+	if( pkt_start_impuls || (bit_count_eq7 && sending_bit) )
+	begin
+		sbyte_cnt <= sbyte_cnt+1;
+		err_too_long<=(sbyte_cnt>20);
+	end
 
 endmodule

@@ -20,7 +20,8 @@ module usb11_ctrl(
 	input wire data_in_wr,
 	input wire data_out_rd,
 	output wire [15:0]data_out,
-	output wire data_out_rdy
+	output wire data_out_rdy,
+	output reg dbg
 );
 
 //divide input 60Mhz on 5 to get 12MHz clock we need for USB11
@@ -64,7 +65,7 @@ generic_fifo_dc_gray #( .dw(16), .aw(5) ) u_usb11fifo_in(
 	);
 generic_fifo_dc_gray #( .dw(16), .aw(5) ) u_usb11fifo_out(
 	.rst(~reset),
-	.rd_clk(clk),
+	.rd_clk(clk_60Mhz),
 	.wr_clk(clk12Mhz),
 	.clr(),
 	.din(w_data_result),
@@ -93,7 +94,7 @@ usb11fifo u_usb11fifo_in(
 usb11fifo u_usb11fifo_out(
 	.aclr(reset),
 	.data(w_data_result),
-	.rdclk(clk),
+	.rdclk(clk_60Mhz),
 	.rdreq(data_out_rd),
 	.wrclk(clk12Mhz),
 	.wrreq(w_data_result_wr),
@@ -125,7 +126,8 @@ reg r_channel;
 reg r_autoack;
 always @(posedge clk12Mhz)
 	begin
-		r_sbyte_wr <= ((state==STATE_PROCESS_USB11_CMD) & (cmd_usb_byte_out & ~cmd_usb_pkt) ) || (state==STATE_SEND_ACK_80);
+		r_sbyte_wr <= ((state==STATE_PROCESS_USB11_CMD) & (cmd_usb_byte_out & ~cmd_usb_pkt) ) 
+			|| (state==STATE_SEND_ACK_80) || (state==STATE_SEND_ACK_D2);
 		if(state==STATE_PROCESS_USB11_CMD)
 		begin
 			r_channel <= cmd_channel;
@@ -236,7 +238,7 @@ always @(posedge clk12Mhz)
 
 assign w_data_result_wr = ((state==STATE_PROCESS_USB11_CMD) & cmd_read_lines) | w_recv_data_rdy;
 assign w_data_result = 
-		w_recv_data_rdy ? { 8'h00, w_recv_data } : { 12'h000, usb1_dp_in, usb1_dm_in, usb0_dp_in, usb0_dm_in };
+		w_recv_data_rdy ? { 8'h00, w_recv_data } : { 12'h00f, usb1_dp_in, usb1_dm_in, usb0_dp_in, usb0_dm_in };
 
 localparam STATE_IDLE = 0;
 localparam STATE_READ_USB11_CMD = 1;
@@ -248,6 +250,7 @@ localparam STATE_SEND_ACK_80 = 6;
 localparam STATE_WAIT_SENT_80 = 7;
 localparam STATE_SEND_ACK_D2 = 8;
 localparam STATE_WAIT_SENT_D2 = 9;
+localparam STATE_ACK_PAUSE = 10;
 
 reg [7:0]state = STATE_IDLE;
 
@@ -283,6 +286,10 @@ begin
 				state <= STATE_IDLE; //no data received but frame ended, error..
 			else
 			if(w_end_of_recv)
+				state <= STATE_ACK_PAUSE;
+		end
+		STATE_ACK_PAUSE: begin
+			if(pause[4])
 				state <= STATE_SEND_ACK_80;
 		end
 		STATE_SEND_ACK_80: begin
@@ -295,11 +302,18 @@ begin
 		STATE_SEND_ACK_D2: begin
 			state <= STATE_WAIT_SENT_D2;
 		end
-		STATE_WAIT_SENT_80: begin
+		STATE_WAIT_SENT_D2: begin
 			if( w_pkt_end  )
 				state <= STATE_IDLE;
 		end
 	endcase
 end
 
+reg [4:0]pause;
+always @(posedge clk12Mhz)
+	if( state==STATE_WAIT_RDATA )
+		pause<=0;
+	else
+		pause<=pause+1;
+			
 endmodule
