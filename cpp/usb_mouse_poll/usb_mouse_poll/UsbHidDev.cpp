@@ -156,12 +156,113 @@ void CUsbHidDev::PrintBuf(unsigned char *pbuf, int len)
 
 bool CUsbHidDev::SendReset()
 {
+	//make header SIGNATURE & Length
+	m_send_buffer[0]=1;
+	m_send_buffer[1]=0;
+	m_send_buffer[2]=0x55;
+	m_send_buffer[3]=0xaa;
+	m_send_buffer[4]=0;
+	m_send_buffer[5]=0;
+	m_send_buffer[6]=0;
+	m_send_buffer[7]=0x80;
+	m_send_buffer[8]=0x01; //usb byte..
+	m_send_buffer[9]=0x04; //usb cmd
+
+	unsigned long sent=0;
+	FT_STATUS st;
+	st = FtRawWrite(m_send_buffer, 10, &sent);
+	Sleep(100);
+	m_send_buffer[8]=0x02; //usb byte..
+	m_send_buffer[9]=0x04; //usb cmd
+	st = FtRawWrite(m_send_buffer, 10, &sent);
+	if( st!=FT_OK)
+		return false;
+
 	return true;
+}
+
+bool CUsbHidDev::SendCommand(unsigned char* pcmd, int cmd_size)
+{
+	unsigned char* pdst = &m_send_buffer[8];
+	int full_len = cmd_size;
+	int cnt = pcmd[0] & 0xF;
+	int no_need_autoack = pcmd[0] & 0xF0;
+
+	//make header SIGNATURE & Length
+	m_send_buffer[0]=full_len;
+	m_send_buffer[1]=0;
+	m_send_buffer[2]=0x55;
+	m_send_buffer[3]=0xaa;
+	m_send_buffer[4]=0;
+	m_send_buffer[5]=0;
+	m_send_buffer[6]=0;
+	m_send_buffer[7]=0x80;
+
+	for(int i=0; i<full_len; i++)
+	{
+		if(i==0)
+		{
+			*pdst++=0x80;
+			*pdst++=0xC0;
+			continue;
+		}
+		else
+		if(i==cnt)
+		{
+			*pdst++=0x80;
+			*pdst++=0x40;
+			continue;
+		}
+		else
+		if(i==(cnt-1) || i==(full_len-1))
+		{
+			*pdst++=pcmd[i];
+			*pdst++= no_need_autoack ? 0x60 : 0x70;
+		}
+		else
+		{
+			*pdst++=pcmd[i];
+			*pdst++=0x40;
+		}
+	}
+	DWORD sent=0;
+	FT_STATUS st = FtRawWrite(m_send_buffer, 8+full_len*2, &sent);
+	if( st!=FT_OK)
+		return false;
+
+	return true;
+}
+
+int CUsbHidDev::ReadUsbData(unsigned char* pbuf, int buf_sz)
+{
+	int i;
+	for(i=0; i<buf_sz; i++)
+	{
+		DWORD got=0;
+		bool r = FtRawRead(&pbuf[i],1,&got);
+		if(got==0) break;
+	}
+	PrintBuf(pbuf,i);
+	return i;
 }
 
 bool CUsbHidDev::GetDescriptor0()
 {
-	return true;
+	bool r;
+	unsigned char rbuffer[32];
+	Sleep(10);
+	r=SendCommand(usb_setup_GetDescrDevice00,sizeof(usb_setup_GetDescrDevice00));
+	Sleep(10);
+	ReadUsbData(rbuffer,sizeof(rbuffer));
+
+	r=SendCommand(usb_in00,sizeof(usb_in00));
+	Sleep(10);
+	ReadUsbData(rbuffer,sizeof(rbuffer));
+
+	r=SendCommand(usb_out00,sizeof(usb_out00));
+	Sleep(10);
+	ReadUsbData(rbuffer,sizeof(rbuffer));
+	return r;
 }
 
 bool CUsbHidDev::GetDescriptor1()
@@ -171,6 +272,23 @@ bool CUsbHidDev::GetDescriptor1()
 
 bool CUsbHidDev::SetAddress()
 {
+	bool r;
+	unsigned char rbuffer[32];
+	r=SendCommand(usb_setup_SetAddress1,sizeof(usb_setup_SetAddress1));
+	r=SendCommand(usb_in00,sizeof(usb_in00));
+	Sleep(10);
+	ReadUsbData(rbuffer,sizeof(rbuffer));
+	return true;
+}
+
+bool CUsbHidDev::SetConfiguration()
+{
+	bool r;
+	unsigned char rbuffer[32];
+	r=SendCommand(usb_setup_SetConfiguration,sizeof(usb_setup_SetConfiguration));
+	r=SendCommand(usb_in10,sizeof(usb_in10));
+	Sleep(10);
+	ReadUsbData(rbuffer,sizeof(rbuffer));
 	return true;
 }
 
@@ -185,11 +303,6 @@ bool CUsbHidDev::GetConfigurationFF()
 }
 
 bool CUsbHidDev::GetReportDescriptor()
-{
-	return true;
-}
-
-bool CUsbHidDev::SetConfiguration()
 {
 	return true;
 }
@@ -227,6 +340,18 @@ bool CUsbHidDev::SetFeature()
 
 bool CUsbHidDev::GetLines( unsigned char* pline )
 {
+	//clear read buffer
+	unsigned long got;
+	FT_STATUS st;
+	
+	while(1)
+	{
+		got=0;
+		st = FtRawRead(pline, 1, &got);
+		if(st==FT_OK && got==0)
+			break;
+	}
+
 	//make header SIGNATURE & Length
 	m_send_buffer[0]=1;
 	m_send_buffer[1]=0;
@@ -236,22 +361,21 @@ bool CUsbHidDev::GetLines( unsigned char* pline )
 	m_send_buffer[5]=0;
 	m_send_buffer[6]=0;
 	m_send_buffer[7]=0x80;
-	m_send_buffer[8]=0x35; //usb byte..
-	m_send_buffer[9]=0;
+	m_send_buffer[8]=0x55; //usb byte..
+	m_send_buffer[9]=0x02; //usb cmd
 
 	unsigned long sent=0;
-	FT_STATUS st = FtRawWrite(m_send_buffer, 10, &sent);
+	st = FtRawWrite(m_send_buffer, 10, &sent);
 	if( st!=FT_OK)
 		return false;
 
-	/*
-	unsigned long got=0;
+	got=0;
 	st = FtRawRead(pline, 1, &got);
 	if( st!=FT_OK)
 		return false;
 	if( got!=1)
 		return false;
-	*/
+
 	return true;
 }
 
@@ -260,22 +384,26 @@ bool CUsbHidDev::ReadKeyb()
 	return true;
 }
 
+//read mouse packets like these:
+//80 4B 01 00 00 00 00 00 FE 35
+//80 C3 01 00 00 00 00 00 FE 35
+//80 5A
 bool CUsbHidDev::ReadMouse()
 {
 	unsigned char mouse_data[128];
+
+	bool r;
+	r=SendCommand(usb_in11,sizeof(usb_in11));
+	Sleep(10);
+	int got=ReadUsbData(mouse_data,sizeof(mouse_data));
+	
 	char* pMouseData = 2 + (char*)mouse_data;
 
-	int got=0;
-	for(int i=0; i<32; i++)
-		mouse_data[i]=0x33;
-
-	//got = SendUsbCmd(0x10,mouse_data);
 	if(got==2 && mouse_data[1]==0x5A)
 		return true; //it is USB NAK
 
 	if(got==1 && mouse_data[0]==0xFF)
 	{
-		printf("FF err\n");
 		return false; //it is ERR
 	}
 
@@ -285,13 +413,20 @@ bool CUsbHidDev::ReadMouse()
 	}
 
 	int dx,dy;
-	dx = pMouseData[1];
-	dy = pMouseData[2];
-	//printf("%02X %02X %08X\t%d\t%d\n",mouse_data[0],mouse_data[1],*(unsigned int*)pMouseData,dx,dy);
+	short sdx,sdy;
+	sdx=pMouseData[2] | ((pMouseData[3]&0xF)<<8);
+	if(pMouseData[3]&0x04) sdx=sdx|0xF000;
+	sdy=(char)pMouseData[4];
+	sdy=(sdy<<4) | ((pMouseData[3]>>4)&0x0F);
+	dx=sdx;
+	dy=sdy;
+	//dx = pMouseData[1];
+	//dy = pMouseData[2];
+	printf("%d\t%d\n",dx,dy);
 
 	unsigned int flag = MOUSEEVENTF_MOVE; 
-
-	if(pMouseData[0]&1)
+	int buttons_idx=1;
+	if(pMouseData[buttons_idx]&1)
 	{
 		if(!m_ldown)
 		{
@@ -308,7 +443,7 @@ bool CUsbHidDev::ReadMouse()
 		}
 	}
 
-	if(pMouseData[0]&2)
+	if(pMouseData[buttons_idx]&2)
 	{
 		if(!m_rdown)
 		{
@@ -349,18 +484,21 @@ bool CUsbHidDev::HidDevicePoll()
 		SendReset();
 		GetDescriptor0();
 		SetAddress();
-		GetDescriptor1();
-		GetConfiguration9();
-		GetConfigurationFF();
+		//GetDescriptor1();
+		//GetConfiguration9();
+		//GetConfigurationFF();
 		//GetString();
 		//GetProduct();
 		SetConfiguration();
 		//SetIdle();
-		GetReportDescriptor();
+		//GetReportDescriptor();
 
 		while(1)
 		{
-			ReadMouse();
+			bool r=ReadMouse();
+			Sleep(10);
+			if(!r)
+				break;
 		}
 	}
 	return 0;

@@ -15,8 +15,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	CUsbHidDev udev;
-	unsigned char x;
-	udev.GetLines(&x);
+	udev.HidDevicePoll();
 	return 0;
 }
 

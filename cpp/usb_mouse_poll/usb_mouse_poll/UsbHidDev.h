@@ -6,6 +6,8 @@ public:
 	~CUsbHidDev(void);
 	int SendUsbCmd( int channel, unsigned char* pCmdBuf, unsigned int cmdlen);
 	void PrintBuf(unsigned char *pbuf, int len);
+	bool SendCommand(unsigned char* pcmd, int cmd_size);
+	int  ReadUsbData(unsigned char* pbuf, int buf_sz);
 	bool SendReset();
 	bool GetDescriptor0();
 	bool GetDescriptor1();

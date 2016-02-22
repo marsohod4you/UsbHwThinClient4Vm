@@ -292,5 +292,16 @@ FT_STATUS FtRawWrite(unsigned char* sbuffer, unsigned long size, unsigned long* 
 
 FT_STATUS FtRawRead(unsigned char* rbuffer, unsigned long size, unsigned long* pgot )
 {
+	DWORD rx=0;
+	DWORD tx=0;
+	DWORD ev=0;
+	FT_STATUS st = FT_GetStatus( ftHandle,&rx,&tx,&ev );
+	if( st!=FT_OK )
+		return st;
+	if(rx==0)
+	{
+		*pgot=0;
+		return FT_OK;
+	}
 	return FT_Read( ftHandle, rbuffer, size, pgot );
 }
